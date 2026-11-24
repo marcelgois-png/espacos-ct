@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Espaços do Centro de Tecnologia da UFPB: blocos, salas, plantas por pavimento, setores, pessoas, aulas e demandas. Protótipo da Direção do CT.">
+<style>html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;background:#fff}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Portal Espaços do CT</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Casca do Portal da Gestão do CT (v64), sem alteração: barra superior, ondas, barra de menus, busca, cartões, faixas, corujas e rodapé */
+/* Layout: barra superior petróleo fixa · barra de menus abaixo da barra superior · busca na barra superior (no lugar dos filtros dos painéis) · uma seção por vez, cada uma com endereço próprio */
+:root{
+  --petroleo:#283E4C; --terracota:#C6543C; --vinho:#7A2632; --cinza:#A5B1BA; --cinza-claro:#F3F3F3;
+  --texto:#1c2431; --texto-2:#3a4452; --texto-3:#5b6573;
+  --borda:#dde3ea; --linha:#e3e7ec; --grade:#E4E7EA;
+  --pastel-az:#EEF2F5; --pastel-tc:#FBF1EC; --pastel-vi:#F7ECEE;
+  --fundo:#F5F7F9; --cartao:#ffffff; --sobre-petroleo:#ffffff; --petroleo-escuro:#1f3240;
+  /* cor de cada seção: forte (ícones e marcas), de fundo com texto branco (-f) e pastel (-p) */
+  --s1:#283E4C; --s1-f:#283E4C; --s1-p:#E3EAEF;   /* Acompanhamento da Gestão: petróleo */
+  --s2:#C6543C; --s2-f:#B34A34; --s2-p:#FBEEE9;   /* Infraestrutura: terracota */
+  --s3:#7A2632; --s3-f:#7A2632; --s3-p:#F3E0E3;   /* Orçamento: vinho */
+  --s4:#3E6B57; --s4-f:#2F5A47; --s4-p:#E3F0E9;   /* Gestão de Pessoas: verde */
+  --s5:#55697A; --s5-f:#4F6272; --s5-p:#E8EDF1;   /* Serviços e Transparência: cinza da paleta, escurecido */
+  --s6:#8F6410; --s6-f:#8F6410; --s6-p:#FAEFCF;
+  --s8:#3D5A8A; --s8-f:#34507D; --s8-p:#E4EAF4;   /* Acadêmico: azul */
+  --s7:#2C7A7B; --s7-f:#256B6C; --s7-p:#E0F0F0;   /* Serviços: verde-azulado */   /* Sistemas do CT: dourado das corujas */
+  --fonte:"Source Sans 3","Segoe UI",Arial,sans-serif;
+  --topo:64px; --menu:52px; --onda:48px; --raio:12px;
+  --safe-t:env(safe-area-inset-top,0px);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{padding-top:var(--safe-t);padding-bottom:env(safe-area-inset-bottom,0px);scroll-padding-top:calc(var(--safe-t) + var(--topo) + var(--onda) + var(--menu))}
+html,body{background:var(--fundo);color:var(--texto)}
+body{--sc:var(--s1);--sf:var(--s1-f);--sp:var(--s1-p)}
+[data-cor="1"]{--sc:var(--s1);--sf:var(--s1-f);--sp:var(--s1-p)}
+[data-cor="2"]{--sc:var(--s2);--sf:var(--s2-f);--sp:var(--s2-p)}
+[data-cor="3"]{--sc:var(--s3);--sf:var(--s3-f);--sp:var(--s3-p)}
+[data-cor="4"]{--sc:var(--s4);--sf:var(--s4-f);--sp:var(--s4-p)}
+[data-cor="5"]{--sc:var(--s5);--sf:var(--s5-f);--sp:var(--s5-p)}
+[data-cor="6"]{--sc:var(--s6);--sf:var(--s6-f);--sp:var(--s6-p)}
+[data-cor="7"]{--sc:var(--s7);--sf:var(--s7-f);--sp:var(--s7-p)}
+[data-cor="8"]{--sc:var(--s8);--sf:var(--s8-f);--sp:var(--s8-p)}
+body{font-family:var(--fonte);font-size:14px;line-height:1.45;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--safe-t);z-index:60;background:var(--petroleo)}
+img{max-width:100%}
+[hidden]{display:none!important}
+h1,h2,h3,h4{color:var(--petroleo);font-weight:600;line-height:1.2;margin:0;text-wrap:balance}
+h3,h4{font-weight:500}
+p{margin:0}
+b,strong{color:var(--petroleo);font-weight:600}
+button{font:inherit;color:inherit}
+a{color:var(--petroleo)}
+:focus-visible{outline:2.5px solid var(--terracota);outline-offset:2px;border-radius:6px}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.so-leitor{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ── Barra superior ── */
+.topo{position:sticky;top:var(--safe-t);z-index:50;height:var(--topo);background:var(--petroleo);color:var(--sobre-petroleo);
+  display:flex;align-items:center;gap:14px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.marca-ct{display:block;padding:4px 2px;border-radius:6px;flex:0 0 auto}
+.marca-ct img{height:38px;width:auto;display:block;max-width:none;opacity:.96;transition:opacity .15s}
+.marca-ct:hover img{opacity:1} .marca-ct:hover{background:var(--petroleo-escuro)}
+.titulo-rel{min-width:0;padding-left:14px;border-left:1px solid rgba(255,255,255,.28);color:inherit;text-decoration:none;border-radius:0 6px 6px 0}
+.titulo-rel:hover h1{text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.5)}
+.titulo-rel:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.titulo-rel h1{color:var(--sobre-petroleo);font-size:18px;font-weight:500;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.titulo-rel span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.insta{margin-left:0;display:flex;align-items:center;gap:8px;color:var(--sobre-petroleo);text-decoration:none;font-weight:500;font-size:13px;
+  padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3);flex:0 0 auto}
+.insta:hover{background:var(--petroleo-escuro)}
+
+/* ── Estrutura ── */
+.casca{display:block}
+.onda-topo{position:absolute;left:0;right:0;top:calc(100% - 2px);width:100%;height:calc(var(--onda) + 4px);transform:rotate(180deg);background:linear-gradient(to top,var(--petroleo) 0 6px,var(--cartao) 6px);pointer-events:none;display:block}
+.casca{padding-top:var(--onda)}
+.topo::after{content:"";position:absolute;left:0;right:0;top:calc(100% - 3px);height:7px;background:var(--petroleo);pointer-events:none}
+@media (max-width:820px){:root{--onda:28px}}
+/* barra de menus (no lugar do menu lateral), fixa logo abaixo da barra superior */
+.menubar{position:sticky;top:calc(var(--safe-t) + var(--topo) + var(--onda) - 1px);z-index:30;display:flex;align-items:stretch;gap:2px;height:var(--menu);
+  background:var(--cartao);border-bottom:1px solid var(--borda);box-shadow:0 2px 6px rgba(28,36,49,.05);
+  padding:0 max(16px,env(safe-area-inset-left,0px));overflow-x:auto;scrollbar-width:none}
+.menubar::-webkit-scrollbar{display:none}
+.item{position:relative;display:flex;align-items:center;gap:8px;padding:0 14px;color:var(--texto-2);font-weight:600;font-size:15px;white-space:nowrap;border:0;background:none;cursor:pointer;flex:0 0 auto}
+.item .ic{width:18px;height:18px;color:var(--sc)}
+.item::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:transparent}
+.item:hover{color:var(--petroleo);background:var(--pastel-az)}
+.item[aria-current="page"]{color:var(--sf)}
+.item[aria-current="page"]::after{background:var(--sf)}
+.item:focus-visible{outline:2.5px solid var(--terracota);outline-offset:-3px}
+.menubar .sep{display:none}
+.menubar .item:first-of-type{margin-left:auto}
+.principal{flex:1;min-width:0}
+
+/* ── Busca na barra superior ── */
+.topo .campo{display:flex;align-items:center;gap:8px;margin-left:auto;margin-right:12px;flex:1 1 260px;max-width:480px;min-width:0;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:7px 14px;color:rgba(255,255,255,.8)}
+.topo .campo .ic{width:17px;height:17px;flex:0 0 auto}
+.topo .campo input{border:0;outline:0;font:inherit;font-size:14px;background:transparent;color:#fff;width:100%;min-width:0}
+.topo .campo input::placeholder{color:rgba(255,255,255,.72)}
+.topo .campo:focus-within{background:rgba(255,255,255,.18);border-color:#fff}
+.topo .campo input::-webkit-search-cancel-button{filter:invert(1)}
+
+/* ── Conteúdo ── */
+.conteudo{margin-inline:auto;width:100%;padding-block:28px 40px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));max-width:1720px}
+.secao{display:flex;flex-direction:column;gap:22px}
+.cab{display:flex;align-items:center;gap:12px}
+.cab .n{flex:0 0 auto;display:grid;place-items:center;min-width:34px;height:34px;padding:0 8px;border-radius:9px;background:var(--sf);color:#fff;font-size:18px;font-weight:600;line-height:1}
+.cab .n .ic{width:18px;height:18px}
+.cab h2{font-size:22px;line-height:1.2}
+.kicker{font-size:14px;color:var(--texto-2);max-width:none;margin:-10px 0 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.stat{background:var(--sf);border-radius:10px;padding:14px 18px}
+.stat b{display:block;font-size:27px;line-height:1.1;font-weight:600;font-variant-numeric:tabular-nums;color:#fff}
+.stat span{font-size:13px;color:#fff}
+.stat.g{background:var(--sp);box-shadow:inset 4px 0 0 var(--sc)}
+.stat.g b{color:var(--sf)}
+.stat.g span{color:var(--texto-2)}
+.cap{font-size:13px;color:var(--texto-3);margin:-10px 0 0;max-width:80ch}
+
+/* abertura */
+.hero{display:flex;align-items:center;gap:18px;background:none;padding:0}
+.hero .owl{width:58px}
+.hero small{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--terracota);margin-bottom:6px}
+/* a abertura é a coruja falando: balão branco com a ponta voltada para ela */
+.lk-fala{font:inherit;color:inherit;font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:var(--terracota);text-underline-offset:3px}
+.hero .bub .pill{vertical-align:2px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:18px;padding:0 7px;border-radius:5px;background:#6B7682;color:#fff}
+.hero .fala{position:relative;flex:1;min-width:0;background:var(--cartao);border-radius:14px;padding:12px 18px 14px;box-shadow:0 1px 2px rgba(28,36,49,.06)}
+.hero .fala::before{content:"";position:absolute;left:-11px;top:50%;margin-top:-9px;border:9px solid transparent;border-left:0;border-right:12px solid var(--cartao)}
+.hero .bub{font-size:18px;line-height:1.35;color:var(--petroleo);font-weight:600;max-width:none;text-wrap:pretty}
+.hero p.sub{margin-top:10px;color:var(--texto-2);max-width:66ch}
+/* Início: pastilhas no estilo do Farol (cartão cheio na cor da seção) */
+.portas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:1100px) and (min-width:821px){.portas:not(.sis){grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1240px){.portas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.porta{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:236px;padding:20px 20px 18px;border:0;border-radius:14px;cursor:pointer;text-align:left;color:#fff;
+  background:linear-gradient(135deg,var(--sf) 0%,color-mix(in srgb,var(--sf) 82%,#fff) 100%);box-shadow:0 1px 2px rgba(28,36,49,.08);transition:transform .15s,box-shadow .15s}
+.porta:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(28,36,49,.18)}
+.porta-ic{width:46px;height:46px;border-radius:11px;background:rgba(255,255,255,.17);display:grid;place-items:center;margin-bottom:6px}
+.porta-ic .ic{width:22px;height:22px;color:#fff}
+.porta-t{font-weight:700;font-size:19px;line-height:1.25;color:#fff}
+.porta-d{font-size:14px;line-height:1.5;color:rgba(255,255,255,.92)}
+.porta .qt{margin-top:auto;padding-top:10px;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;display:inline-flex;align-items:center;gap:6px}
+.porta .qt .ic{width:15px;height:15px;transition:transform .15s} .porta:hover .qt .ic{transform:translateX(3px)}
+.porta:focus-visible{outline:2.5px solid var(--terracota);outline-offset:3px}
+a.porta{text-decoration:none}
+/* Sistemas: cartão com imagem, etiqueta da categoria, nome e explicação */
+/* faixas horizontais com cartões do tamanho dos de Sistemas */
+.sis-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:24px}
+.ciclo.fx{display:flex;flex-direction:column;gap:0}
+.fx-passo{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:0 24px;padding-right:22px;background:var(--cartao);border:1px solid var(--borda);border-radius:var(--raio)}
+.fx-ini{display:flex;min-width:0}
+.fx-rot{flex:0 0 52px;background:var(--pc);color:#fff;border-radius:var(--raio) 0 0 var(--raio);margin:-1px 0 -1px -1px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:18px 0}
+.fx-rot h3{writing-mode:vertical-rl;transform:rotate(180deg);font-size:20px;font-weight:600;color:#fff;margin:0;white-space:nowrap}
+.fx-rot .passo-n{order:0;transform:rotate(-90deg)}
+.fx-esq{flex:1;min-width:0;display:flex;flex-direction:column;padding:22px 0 22px 20px}
+.fx-q{margin:0 0 8px;font-size:15px;font-weight:600;color:var(--pc)}
+.fx-tx{margin:0 0 16px;font-size:14px;line-height:1.55;color:var(--texto-2)}
+.fx-fim{margin:auto 0 0;padding-top:12px;border-top:1px solid var(--borda);font-size:13px;color:var(--texto-2)}
+.fx-fim span{display:block;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--pc);margin-bottom:2px}
+.fx-cards{grid-column:2 / -1;display:grid;grid-template-columns:subgrid;gap:24px;padding:22px 0;align-content:start}
+@container ciclo (min-width:1150px){
+  .fx-cards>[data-id="ajuda-infra"]{grid-area:1/1} .fx-cards>[data-id="pedir-manutencao"]{grid-area:1/2}
+  .fx-cards>[data-id="processos-manutencao"]{grid-area:2/1} .fx-cards>[data-id="cuida"]{grid-area:2/2} .fx-cards>[data-id="painel-cuida"]{grid-area:2/3}
+}
+.fx-liga{display:flex;align-items:center;gap:8px;height:44px;padding-left:16px;color:var(--sf);font-size:12.5px;font-weight:500}
+.fx-liga .ic{width:20px;height:20px}
+.fx-liga span{color:var(--texto-2)}
+.fx-liga-base{padding-left:2px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.fx-base .fx-rot h3{font-size:16px}
+.fx-wrap .retorno.plano{margin-top:14px}
+@media (max-width:820px){
+  .fx-passo{grid-template-columns:minmax(0,1fr);padding-right:0}
+  .fx-cards{grid-column:1;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));padding:4px 16px 18px 68px}
+  .fx-esq{padding-right:16px}
+}
+@media (max-width:560px){
+  .fx-rot{flex-basis:40px} .fx-rot h3{font-size:17px}
+  .fx-esq{padding:16px 14px} .fx-cards{padding:0 14px 16px 54px;gap:20px}
+}
+.sis-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;border:1px solid #D3DCE4;border-radius:18px;background:#F7F9FB;text-decoration:none;color:var(--texto);transition:box-shadow .15s,transform .15s}
+a.sis-card:hover{box-shadow:0 10px 24px rgba(28,36,49,.12);transform:translateY(-2px)}
+button.sis-card{font:inherit;text-align:left;cursor:pointer;width:100%}
+button.sis-card:hover{box-shadow:0 10px 24px rgba(28,36,49,.12);transform:translateY(-2px)}
+.porta-criar{border-style:dashed}
+#sec-inicio .hero{margin-bottom:22px}
+.sis-card:focus-visible{outline:2.5px solid var(--terracota);outline-offset:3px}
+.sis-img{position:relative;display:block;height:150px;border-radius:12px;overflow:hidden;margin-bottom:6px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--sf) 80%,#fff) 0%,var(--sf) 55%,color-mix(in srgb,var(--sf) 70%,#000) 100%)}
+.sis-fundo{position:absolute;right:-26px;bottom:-34px;color:#fff;opacity:.13}
+.sis-fundo .ic{width:190px;height:190px;stroke-width:1.4}
+.sis-marca{position:absolute;left:20px;right:24px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sis-marca .ic{width:34px;height:34px;stroke-width:1.8}
+.sis-marca b{color:inherit;font-size:24px;font-weight:700;letter-spacing:-.01em;line-height:1.1;min-width:0;overflow-wrap:break-word}
+.sis-marca .ic{flex:0 0 auto}
+.sis-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sis-tag{display:inline-block;font-size:13px;line-height:1;padding:5px 12px;border:1.3px solid var(--sf);border-radius:999px;color:var(--sf);background:#fff}
+.sis-t{font-size:20px;font-weight:700;line-height:1.25;color:var(--petroleo)}
+.sis-d{font-size:15px;line-height:1.55;color:var(--texto-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sis-ir{margin-top:auto;padding-top:4px;font-size:12.5px;font-weight:600;color:var(--sc);display:inline-flex;align-items:center;gap:6px}
+.sis-ir .ic{width:14px;height:14px}
+.sis-card.sem{border-style:dashed;border-color:#8A96A1}
+.sis-card.sem .sis-img{background:linear-gradient(135deg,#C9D2DA,#8A96A1)}
+.porta.sis{min-height:196px}
+.porta.sis .qt{text-transform:none;letter-spacing:.02em;font-size:12.5px}
+.porta.sem{background:var(--cartao);color:var(--texto-2);border:1.5px dashed #8A96A1;box-shadow:none;cursor:default}
+.porta.sem:hover{transform:none;box-shadow:none}
+.porta.sem .porta-ic{background:#E8EDF1} .porta.sem .porta-ic .ic{color:var(--texto-3)}
+.porta.sem .porta-t{color:var(--petroleo)} .porta.sem .porta-d{color:var(--texto-2)} .porta.sem .qt{color:var(--texto-3)}
+.sis-pill{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 9px}
+/* atalhos: versão clara, no pastel da seção */
+.atalhos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:1240px){.atalhos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.atalho{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:150px;padding:18px 18px 16px;border-radius:14px;text-decoration:none;cursor:pointer;text-align:left;width:100%;
+  color:var(--petroleo);font-weight:600;font-size:15px;line-height:1.35;border:1px solid color-mix(in srgb,var(--sf) 22%,#fff);
+  background:linear-gradient(135deg,var(--sp) 0%,color-mix(in srgb,var(--sp) 55%,#fff) 100%);transition:transform .15s,box-shadow .15s}
+.atalho:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(28,36,49,.12)}
+.at-ic{flex:0 0 auto;width:40px;height:40px;border-radius:10px;background:var(--sf);color:#fff;display:grid;place-items:center}
+.at-ic .ic{width:19px;height:19px}
+.at-cta{margin-top:auto;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--sc);display:inline-flex;align-items:center;gap:6px}
+.at-cta .ic{width:15px;height:15px}
+
+/* grupos e cartões de item */
+.grupo{display:flex;flex-direction:column;gap:8px}
+.grupo-t{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.grupo-t h3{font-size:18px}
+.grupo-t h3::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--sc);margin-right:8px}
+.grupo-t span{font-size:13px;color:var(--texto-3)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:10px}
+/* cartão de item compacto: duas linhas, cerca de 48px de altura */
+.lc{display:flex;gap:10px;align-items:center;background:var(--sp);border:1px solid color-mix(in srgb,var(--sc) 18%,transparent);border-left:3px solid var(--sc);border-radius:10px;padding:4px 10px;text-decoration:none;color:var(--texto);
+  text-align:left;width:100%;min-width:0;transition:border-color .15s,box-shadow .15s}
+a.lc,button.lc{cursor:pointer}
+a.lc:hover,button.lc:hover{border-color:var(--sc);box-shadow:0 3px 10px rgba(40,62,76,.08)}
+.lc-ic{flex:0 0 auto;width:28px;height:28px;border-radius:8px;background:var(--sf);color:#fff;display:grid;place-items:center}
+.lc-ic .ic{width:16px;height:16px}
+.lc[data-sit="criar"],.lc[data-sit="informar"]{border:1px dashed var(--cinza);padding-left:12px;background:transparent}
+.lc[data-sit="criar"] .lc-ic,.lc[data-sit="informar"] .lc-ic{background:var(--cinza-claro);color:var(--texto-3)}
+.lc-tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}
+.lc-l1{display:flex;align-items:baseline;gap:8px;min-width:0}
+.lc-t{flex:1;min-width:0;font-size:14px;font-weight:500;color:var(--petroleo);line-height:1.2}
+.lc>.pill{flex:0 0 auto;align-self:center;font-size:10px;line-height:15px;padding:0 7px}
+.lc-d{display:block;min-width:0;max-width:52ch;font-size:13px;line-height:1.3;color:var(--texto-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lc-d b{font-weight:600;color:var(--sf)}
+.lc-go{flex:0 0 auto;color:var(--sf);display:grid;place-items:center}
+.lc-go .ic{width:14px;height:14px}
+.tipo{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--texto-3)}
+.pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.p-az{background:#E3E9EE;color:var(--petroleo)} .p-tc{background:#F6E0D8;color:#9a3a24} .p-vi{background:#F2DEE1;color:var(--vinho)} .p-cz{background:#EDEFF1;color:var(--texto-2)} .p-vd{background:#DAF0DF;color:#17603A} .p-am{background:#FBEFC6;color:#6B4E00}
+
+/* caixas de leitura */
+.owlbox{display:flex;gap:18px;align-items:center;padding:0;background:none!important}
+/* Sistemas do CT: explicação sempre em duas linhas, para as pastilhas terem a mesma altura */
+/* pastilha no modelo de Marcel (20/11/2026): faixa de cima na cor forte da seção, com ícone, título e seta em branco;
+   corpo na cor clara, com a explicação em duas linhas e a etiqueta de situação à direita */
+.lc{--cab:34px;display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:var(--cab) auto;align-items:center;column-gap:10px;row-gap:0;
+  padding:0!important;border:1.5px solid var(--sf);border-radius:10px;overflow:hidden;
+  background:linear-gradient(var(--sf) 0 var(--cab),var(--sp) var(--cab))}
+.lc-tx,.lc-l1{display:contents!important}
+.lc .lc-ic{grid-row:1;grid-column:1;width:auto;height:auto;background:none;color:#fff;margin-left:11px}
+.lc .lc-ic .ic{width:17px;height:17px}
+.lc .lc-t{grid-row:1;grid-column:2;color:#fff;font-weight:600;font-size:14px}
+.lc .lc-go{grid-row:1;grid-column:3;color:#fff;margin-right:11px}
+.lc:not(.mini) .lc-d{min-height:calc(2.6em + 17px)!important}
+.lc .lc-d{grid-row:2;grid-column:1 / 3;max-width:none;padding:8px 0 9px 12px;color:var(--texto)}
+.lc>.pill{grid-row:2;grid-column:3;margin-right:10px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:18px;padding:0 8px;border-radius:5px}
+.lc>.pill.p-vd{background:#1E6B37;color:#fff} .lc>.pill.p-tc{background:#B34A34;color:#fff} .lc>.pill.p-vi{background:var(--vinho);color:#fff} .lc>.pill.p-cz{background:#6B7682;color:#fff} .lc>.pill.p-am{background:#F2C230;color:#3A2A00}
+a.lc:hover,button.lc:hover{box-shadow:0 4px 12px rgba(28,36,49,.16);filter:brightness(1.03)}
+.lc[data-sit="criar"],.lc[data-sit="informar"]{border:1.5px dashed #8A96A1;background:linear-gradient(#DDE3E8 0 var(--cab),#F7F9FA var(--cab))}
+.lc[data-sit="criar"] .lc-ic,.lc[data-sit="informar"] .lc-ic,.lc[data-sit="criar"] .lc-t,.lc[data-sit="informar"] .lc-t{background:none;color:var(--texto-2)}
+/* pastilha pequena: só a faixa de cima e a etiqueta */
+.lc.mini{grid-template-columns:auto minmax(0,1fr) auto!important;gap:0 8px!important}
+.lc.mini .lc-ic{margin-left:9px} .lc.mini .lc-ic .ic{width:14px;height:14px}
+.lc.mini .lc-t{grid-column:2;font-size:13px}
+.lc.mini .lc-go{grid-row:1;grid-column:3;margin-right:9px}
+.lc.mini>.pill{grid-row:2;grid-column:1 / -1;justify-self:start;margin:7px 0 8px 10px}
+/* todas as pastilhas têm a mesma altura: título numa linha e explicação sempre em duas, com largura fixa */
+.lc:not(.mini) .lc-t{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lc:not(.mini) .lc-d{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3;min-height:2.6em;max-width:none}
+#sec-sistemas .cards{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+@media (max-width:420px){#sec-sistemas .cards{grid-template-columns:1fr}}
+/* a coruja fala: o texto vai num balão branco com a ponta voltada para ela */
+.owlbox .t{position:relative;flex:1;min-width:0;font-size:18px;line-height:1.35;color:var(--petroleo);max-width:none;background:var(--cartao);border-radius:14px;padding:12px 18px 14px;box-shadow:0 1px 2px rgba(28,36,49,.06)}
+.owlbox .t::before{content:"";position:absolute;left:-11px;top:50%;margin-top:-9px;border:9px solid transparent;border-left:0;border-right:12px solid var(--cartao)}
+.owlbox .t p{margin:0} .owlbox .t p+p{margin-top:8px}
+.topo-coruja{margin:-6px 0 4px}
+.caixa-obj .t{background:var(--pastel-az);border-radius:12px;padding:14px 18px;font-size:15px;color:var(--petroleo)}
+.caixa-obj .h{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;color:var(--petroleo)}
+.owlbox .h{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.topo-coruja .t{font-weight:600;text-wrap:pretty}
+.topo-coruja .t b{font-weight:inherit}
+.topo-coruja .h{color:var(--sf)!important}
+.topo-coruja .owl{width:58px}
+.ob-blue{background:var(--pastel-az)} .ob-blue .h{color:var(--petroleo)}
+.ob-amber{background:var(--pastel-tc)} .ob-amber .h{color:var(--terracota)}
+.ob-grey{background:var(--cinza-claro)} .ob-grey .h{color:var(--texto-3)}
+.secao[data-cor] .owlbox:not(.ob-grey) .h{color:var(--sf)}
+.owl{flex:0 0 auto;width:58px} .owl svg{width:100%;height:auto;display:block}
+
+/* ficha do painel */
+.voltar{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--borda);background:var(--cartao);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer;font-weight:500;color:var(--sf);font-size:13px}
+.voltar:hover{border-color:var(--sc)}
+.voltar .ic{width:16px;height:16px}
+.ficha-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:-12px}
+.meta4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.mt{background:var(--cartao);border:1px solid var(--borda);border-top:3px solid var(--sc);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.mt span{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--texto-3);display:flex;align-items:center;gap:6px}
+.mt span .ic{width:15px;height:15px;color:var(--sc)}
+.mt b{font-size:14px;font-weight:500;line-height:1.35}
+.mt b.def{color:var(--texto-3);font-weight:400;font-style:italic}
+.moldura{border:2px dashed var(--cinza);border-radius:var(--raio);padding:36px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;background:repeating-linear-gradient(135deg,transparent 0 14px,rgba(165,177,186,.10) 14px 28px)}
+.moldura h3{font-size:18px}
+.moldura p{max-width:60ch;color:var(--texto-2)}
+.bt{display:inline-flex;align-items:center;gap:8px;margin-top:8px;background:var(--sf);color:#fff;text-decoration:none;font-weight:500;border-radius:999px;padding:10px 18px;font-size:14px}
+.bt:hover{filter:brightness(.9)}
+.bt .ic{width:16px;height:16px}
+
+/* infográfico do ciclo: três passos em seta, com volta ao começo */
+.ciclo-wrap{display:flex;flex-direction:column;margin-bottom:6px;container:ciclo / inline-size}
+.ciclo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:28px}
+.passo{position:relative;display:grid;grid-row:span 5;grid-template-rows:subgrid;row-gap:0;background:var(--cartao);border:1px solid var(--borda);border-top:0;border-radius:var(--raio)}
+.passo-top{display:flex;align-items:center;gap:12px;background:var(--pc);color:#fff;padding:14px 16px;margin:0 -1px;border-radius:var(--raio) var(--raio) 0 0}
+.passo-q{display:none}
+.passo-n{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:#fff;color:var(--pc);display:grid;place-items:center;font-size:18px;font-weight:600}
+.passo-top h3{color:#fff;font-size:22px;font-weight:600;line-height:1.1}
+.passo-top .q{display:block;font-size:13px;line-height:1.3;margin-top:2px}
+.passo-num{display:flex;gap:20px;flex-wrap:wrap;padding:16px 16px 0}
+.passo-num b{display:block;font-size:27px;line-height:1.1;font-weight:600;color:var(--pc);font-variant-numeric:tabular-nums}
+.passo-num span{font-size:13px;color:var(--texto-2)}
+.passo-tx{font-size:14px;color:var(--texto-2);padding:12px 16px 0}
+.passo .cards{grid-template-columns:1fr;gap:8px;padding:14px 16px 0;align-content:start}
+.passo-fim{margin:14px 16px 0;padding:10px 0 14px;border-top:1px solid var(--linha);font-size:13px;color:var(--texto-2)}
+.passo-fim span{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--pc)}
+.retorno{position:relative;height:32px;margin:0 calc((100% - 56px)/6) 12px;border:2px solid var(--cinza);border-top:0;border-radius:0 0 16px 16px}
+.retorno::before{content:"";position:absolute;left:-8px;top:-6px;border:7px solid transparent;border-top:0;border-bottom-color:var(--cinza)}
+.retorno span{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;background:var(--fundo);padding:0 12px;font-size:13px;font-weight:500;color:var(--petroleo);white-space:nowrap}
+.retorno .ic{width:16px;height:16px;color:var(--sc)}
+.minis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:-2px;padding-left:12px;border-left:2px solid var(--sp)}
+.lc.mini{display:grid;grid-template-columns:22px minmax(0,1fr) auto;align-items:center;gap:5px 8px;padding:6px 8px}
+.lc.mini .lc-ic{width:22px;height:22px;border-radius:6px} .lc.mini .lc-ic .ic{width:13px;height:13px}
+.lc.mini .lc-tx,.lc.mini .lc-l1{display:contents}
+.lc.mini .lc-t{grid-column:2 / -1;font-size:13px} .lc.mini .lc-d{display:none!important}
+/* faixa de base: o que vale para todos os passos do ciclo */
+.base{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:14px 28px;align-items:center;margin:10px 0 12px;background:var(--cartao);border:1px solid var(--borda);border-left:4px solid var(--sc);border-radius:var(--raio);padding:14px 16px}
+.base-t .rot{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--sf)}
+.base-t h3{font-size:18px;font-weight:600;line-height:1.2;margin:2px 0 6px}
+.base-t p{font-size:14px;color:var(--texto-2)}
+.base-c{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px}
+.base .lc-d{white-space:normal}
+@container ciclo (max-width:1099px){.base{grid-template-columns:1fr}}
+@container ciclo (max-width:560px){.base-c{grid-template-columns:1fr}}
+/* fluxo: setas entre as pastilhas */
+.ciclo.fluxo .passo{grid-row:span 7}
+.ciclo.fluxo .cards{display:contents}
+.ciclo.fluxo .cards>:is(.lc,.sis-card){position:relative;width:auto;margin:0 16px;justify-self:stretch;align-self:stretch}
+.ciclo.fluxo .cards>:is(.lc,.sis-card):first-child{margin-top:14px}
+.liga{display:grid;place-items:center;height:28px;color:var(--sf)}
+.passo .sis-card,.base .sis-card,.cards .sis-card{gap:8px;padding:12px 12px 14px;background:#fff}
+.passo .sis-img,.base .sis-img,.cards .sis-img{height:112px}
+.passo .sis-marca b,.cards .sis-marca b{font-size:21px;max-width:240px}
+.sis-card.mini .sis-img{height:64px;margin-bottom:0}
+.sis-card.mini .sis-marca{left:14px}.sis-card.mini .sis-marca .ic{width:22px;height:22px}.sis-card.mini .sis-marca b{font-size:15px}
+.sis-card.mini .sis-fundo .ic{width:110px;height:110px}
+.sis-card.mini .sis-t{font-size:15px}
+.diag .no>.sis-card{height:100%}
+.minis .sis-card{height:100%}
+.passo .sis-t{font-size:18px}
+.passo .sis-d{font-size:14px}
+.sis-card .pill{font-size:10px}
+.liga .ic{width:22px;height:22px}
+.ciclo.fluxo .passo.entra .cards>:is(.lc,.sis-card):last-child::before{content:"";position:absolute;right:calc(100% + 4px);top:50%;width:61px;height:2px;margin-top:-1px;background:var(--sf);pointer-events:none}
+.ciclo.fluxo .passo.entra .cards>:is(.lc,.sis-card):last-child::after{content:"";position:absolute;right:calc(100% + 5px);top:50%;width:9px;height:9px;border-top:2px solid var(--sf);border-right:2px solid var(--sf);transform:translateY(-50%) rotate(45deg);pointer-events:none}
+@container ciclo (max-width:1099px){
+  .ciclo.fluxo .passo.entra .cards>:is(.lc,.sis-card):last-child::before,.ciclo.fluxo .passo.entra .cards>:is(.lc,.sis-card):last-child::after{display:none}
+  .ciclo{grid-template-columns:1fr;row-gap:32px}
+  .passo-top{clip-path:none;margin:0 -1px;padding-right:16px;border-radius:var(--raio) var(--raio) 0 0}
+  .passo:not(:last-child)::after{content:"";position:absolute;left:50%;bottom:-24px;transform:translateX(-50%);border:11px solid transparent;border-bottom:0;border-top-color:var(--pc)}
+  .retorno{height:auto;margin:18px 0 0;border:0}
+  .retorno::before{display:none}
+  .retorno span{position:static;transform:none;background:none;padding:0;white-space:normal}
+}
+@container ciclo (min-width:620px) and (max-width:1099px){
+  .ciclo:not(.fluxo):not(.diag) .passo .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* diagrama: quadros 1 e 2 lado a lado, quadro 3 abaixo; as setas são desenhadas por cima, em SVG */
+.ciclo-wrap{position:relative}
+.ciclo.diag{display:flex;flex-direction:column;gap:32px}
+.ciclo.diag .passo{display:block}
+.diag .cards{display:flex;flex-direction:column;gap:28px}
+.diag .fim-esq{display:none}
+.diag .no>.lc{height:auto}
+.diag .minis{margin:0;padding:0;border:0}
+svg.setas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:3}
+svg.setas path{fill:none;stroke:var(--sf);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+svg.setas text{font:500 11px var(--fonte);fill:var(--texto-2);paint-order:stroke;stroke:var(--fundo);stroke-width:4px;stroke-linejoin:round}
+.retorno.plano{height:auto;margin:18px 0 12px;border:0}
+.retorno.plano::before{display:none}
+.retorno.plano span{position:static;transform:none;background:none;padding:0;white-space:normal}
+@container ciclo (min-width:1100px){
+  .ciclo.diag{display:grid;gap:0;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto auto 28px auto auto auto}
+  .ciclo.diag.faixas{grid-template-rows:none;row-gap:40px}
+  .ciclo.diag .passo{display:grid;grid-template-columns:subgrid}
+  .diag .cards{display:contents}
+  /* quadros lado a lado, com as linhas de pastilhas alinhadas entre os dois */
+  .diag .lado.p1{grid-column:1;grid-row:1 / span 7;grid-template-rows:subgrid}
+  .diag .lado.p2{grid-column:3 / span 2;grid-row:1 / span 7;grid-template-rows:subgrid}
+  .diag .lado>.passo-top{grid-row:1;grid-column:1 / -1}
+  .diag .lado>.passo-num{grid-row:2;grid-column:1 / -1}
+  .diag .lado>.passo-tx{grid-row:3;grid-column:1 / -1;padding-bottom:14px}
+  .diag .lado>.passo-fim{grid-row:7;grid-column:1}
+  .diag .lado.p2>.passo-fim{margin-right:30px}
+  .diag .lado.p1 .no{grid-column:1;margin:0 16px}
+  .diag .lado.p2 .no.c-a{grid-column:1;margin:0 30px 0 16px}
+  .diag .lado.p2 .no.c-b{grid-column:2;margin:0 16px 0 30px}
+  .diag .lado .no.r-1{grid-row:4}
+  .diag .lado .no.r-2{grid-row:6}
+  .diag .lado .no{align-self:stretch} .diag .lado .minis{height:100%} .diag .lado .lc.mini{height:100%}
+  /* faixa: quadro na largura toda, com o título e o texto à esquerda e as pastilhas à direita */
+  .diag .faixa{grid-column:1 / -1;grid-template-rows:auto 28px auto;padding-bottom:16px;border-top:1px solid var(--borda)}
+  .diag:not(.faixas) .faixa{grid-row:8;margin-top:40px}
+  .diag .esq{grid-column:1;grid-row:1 / -1;display:grid;grid-template-columns:58px minmax(0,1fr);grid-template-rows:auto auto 1fr;align-content:stretch;margin-bottom:-16px}
+  .diag .faixa .fim-esq{display:block} .diag .faixa .fim-baixo{display:none}
+  .diag .faixa .esq>.passo-fim{grid-column:2;grid-row:3;align-self:end;margin:0 16px 16px;padding-top:10px}
+  /* faixa: o número e o título ficam numa coluna à esquerda, escritos de baixo para cima */
+  .diag .faixa .passo-top{grid-column:1;grid-row:1 / -1;writing-mode:vertical-rl;transform:rotate(180deg);justify-content:flex-start;margin:-1px 0 -1px -1px;padding:16px 0;border-radius:0 var(--raio) var(--raio) 0}
+  .diag .faixa .passo-top .q{display:none}
+  .diag .faixa .passo-top h3{font-size:20px}
+  .diag .faixa .passo-q{display:block;grid-column:2;margin:16px 16px 0;font-size:14px;font-weight:600;color:var(--pc)}
+  .diag .faixa .esq>.passo-tx{grid-column:2;padding:6px 16px 16px}
+  .diag .faixa .no.c-a{grid-column:3;margin:0 30px 0 16px}
+  .diag .faixa .no.c-b{grid-column:4;margin:0 16px 0 30px}
+  .diag .faixa .no.c-x{grid-column:3 / -1;margin:0 16px}
+  .diag .faixa .no.r-1{grid-row:1;margin-top:16px}
+  .diag .faixa .no.r-2{grid-row:3}
+}
+
+/* Carta e PDI estruturados */
+.eixo{display:flex;flex-direction:column;gap:16px}
+.eixo-t{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--sf);color:#fff;border-radius:10px;padding:10px 16px;font-size:13px}
+.eixo-t h3{flex:1;min-width:0;color:#fff;font-size:18px;font-weight:600}
+.eixo-n{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,.18);border-radius:6px;padding:2px 8px}
+details.ac{background:var(--cartao);border:1px solid var(--borda);border-left:3px solid var(--sc);border-radius:10px}
+details.ac>summary{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;list-style:none;font-weight:500;color:var(--petroleo)}
+details.ac>summary::-webkit-details-marker{display:none}
+details.ac>summary:hover{background:var(--pastel-az);border-radius:8px}
+details.ac .chev{width:16px;height:16px;color:var(--sc);transition:transform .2s}
+details.ac[open] .chev{transform:rotate(180deg)}
+details.ac .nome{flex:1;min-width:0}
+details.ac .meta{font-size:13px;font-weight:400;color:var(--texto-3);white-space:nowrap}
+.ac-corpo{padding:2px 12px 12px 38px}
+table.cm{width:100%;border-collapse:collapse;font-size:13px;line-height:1.4}
+table.cm th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--texto-3);padding:6px 10px;border-bottom:2px solid var(--sc)}
+table.cm td{padding:8px 10px;border-bottom:1px solid var(--linha);vertical-align:top}
+table.cm tr:last-child td{border-bottom:0}
+table.cm td:first-child{width:38%;font-weight:500;color:var(--petroleo)}
+table.cm ul{margin:0;padding-left:16px} table.cm li+li{margin-top:3px}
+.valores{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.barra-ac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.barra-ac .bt{margin-top:0}
+.bt2{border:1px solid var(--borda);background:var(--cartao);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:500;color:var(--sf);cursor:pointer}
+.bt2:hover{border-color:var(--sc)}
+.oe{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--cartao);border:1px solid var(--borda);border-left:3px solid var(--sc);border-radius:10px;padding:8px 12px}
+.oe-cod{flex:0 0 auto;font-size:13px;font-weight:600;color:#fff;background:var(--sf);border-radius:6px;padding:1px 8px;font-variant-numeric:tabular-nums}
+.oe-n{flex:1;min-width:200px;font-weight:500;color:var(--petroleo)}
+
+/* sobre */
+.mapa{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.mapc{display:flex;gap:14px;background:var(--cartao);border:1px solid var(--borda);border-radius:10px;padding:14px 16px;font-size:14px}
+.mapc>.ic{color:var(--terracota);margin-top:2px;width:22px;height:22px}
+.leg{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.leg div{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.tipos-leg{gap:10px} .tipos-leg div{flex-wrap:nowrap;align-items:flex-start}
+.tic{flex:0 0 auto;width:26px;height:26px;border-radius:7px;background:var(--pastel-az);color:var(--petroleo);display:grid;place-items:center}
+.tic .ic{width:15px;height:15px}
+.ponto{align-self:center;flex:0 0 auto;width:12px;height:12px;border-radius:4px;background:var(--sf)}
+.tabwrap{overflow:auto;max-height:min(58vh,520px);border:1px solid var(--borda);border-radius:10px;background:var(--cartao)}
+table.q{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;line-height:1.4}
+table.q th{position:sticky;top:0;z-index:2;background:var(--cartao);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--texto-3);
+  padding:10px 14px;border-bottom:2px solid var(--petroleo);font-weight:600;white-space:nowrap}
+table.q td{padding:10px 14px;border-bottom:1px solid var(--linha);vertical-align:middle}
+table.q tbody tr:hover td{background:var(--pastel-az)}
+table.q td.a{font-weight:600;color:var(--petroleo)}
+.lk{border:0;background:none;padding:0;cursor:pointer;color:var(--terracota);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.lk .ic{width:15px;height:15px}
+.adef{color:var(--texto-3);font-style:italic}
+table.q td .nota{display:block;font-size:12px;font-weight:400;color:var(--texto-3);margin-top:2px}
+ul.ck{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;max-width:80ch}
+ul.ck li{display:flex;gap:10px;align-items:flex-start}
+ul.ck li .ic{color:var(--terracota);margin-top:2px}
+.principal{display:flex;flex-direction:column;min-height:calc(100dvh - var(--topo) - var(--onda) - var(--menu) - var(--safe-t))}
+.principal>.conteudo{flex:1 0 auto}
+.rodape{margin-top:24px;color:#fff}
+.rodape .onda{display:block;width:100%;height:72px;margin-bottom:-8px}
+.rodape-corpo{position:relative;background:var(--petroleo);display:flex;align-items:center;gap:26px;padding:8px max(24px,env(safe-area-inset-left,0px)) 30px}
+.rodape-marca{flex:0 0 auto;display:block} .rodape-marca img{display:block;height:92px;width:auto}
+.rodape-tx{min-width:0;max-width:1400px}
+.rodape-t{display:block;font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.rodape-tx p{margin:0 0 4px;font-size:15px;line-height:1.5;color:rgba(255,255,255,.92)}
+.rodape-tx .rodape-nota{font-size:14px;color:rgba(255,255,255,.75)}
+.rodape-links{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:10px;font-size:13px}
+.rodape-links a{color:#fff;text-decoration:none;border-bottom:1px solid var(--terracota);padding-bottom:1px}
+.rodape-links a:hover{border-bottom-color:#fff}
+.assin b{letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+.vazio{background:var(--cartao);border:1px solid var(--borda);border-radius:var(--raio);padding:28px 24px;text-align:center;color:var(--texto-2)}
+
+@media (max-width:1000px){
+  .stats,.meta4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:820px){
+  /* no celular, a barra de menus rola para o lado */
+  .menubar{--menu:46px;padding:0 6px} .item{padding:0 11px;font-size:14px}
+  /* no celular, os títulos usam a linha inteira antes de quebrar */
+  h1,h2,h3,h4,.hero .bub{text-wrap:wrap}
+  .hero .bub,.hero p.sub{max-width:none}
+  .titulo-rel span,.insta span{display:none}
+  .marca-ct img{height:32px}
+  .portas,.atalhos,.mapa{grid-template-columns:1fr}
+  .porta{min-height:0;padding:16px 16px 14px} .atalho{min-height:0;padding:14px 16px}
+  .topo .campo{margin-left:auto;margin-right:8px}
+  .conteudo{padding-left:16px;padding-right:16px}
+  .rodape-corpo{flex-direction:column;align-items:flex-start;gap:14px;padding:6px 16px 24px} .rodape .onda{height:44px}
+}
+@media (max-width:480px){
+  .stats{grid-template-columns:1fr 1fr} .stat b{font-size:22px}
+  .meta4{grid-template-columns:1fr}
+  .titulo-rel h1{font-size:14px}
+  .marca-ct img{height:28px}
+  /* a coruja fica no canto e o texto corre ao lado e por baixo dela, na largura toda da caixa */
+  .owlbox,.hero{flex-direction:column;align-items:flex-start;gap:12px;padding:14px} .owl,.hero .owl,.topo-coruja .owl{width:44px}
+  .hero .bub,.topo-coruja .t{font-size:16px}
+  .hero .fala{align-self:stretch;padding:12px 14px 14px}
+  .hero .fala::before{left:14px;top:-11px;margin-top:0;border:9px solid transparent;border-top:0;border-bottom:12px solid var(--cartao)}
+  .owlbox .t{max-width:none;align-self:stretch;padding:12px 14px 14px}
+  .owlbox .t::before{left:14px;top:-11px;margin-top:0;border:9px solid transparent;border-top:0;border-bottom:12px solid var(--cartao)}
+  /* no celular pequeno, a busca ocupa o lugar do nome do portal */
+  .titulo-rel{display:none} .topo .campo{margin-left:8px;margin-right:6px;padding:6px 12px} .topo .campo input{font-size:16px}
+
+  details.ac>summary{flex-wrap:wrap} details.ac .nome{flex-basis:calc(100% - 30px)} details.ac .meta{margin-left:26px}
+  .ac-corpo{padding-left:12px} table.cm thead{display:none} table.cm td{display:block;width:auto!important;padding:6px 0} table.cm td:first-child{border-bottom:0;padding-bottom:0}
+}
+@media (min-width:821px){html{zoom:.8} .principal{min-height:calc(100dvh / .8 - var(--topo) - var(--onda) - var(--menu) - var(--safe-t))} .tabwrap{max-height:min(72vh,650px)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ── Acréscimos do protótipo do app, na mesma linguagem da casca ── */
+#tela{min-height:36vh}
+.selo{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:18px;padding:0 7px;border-radius:5px;background:#6B7682;color:#fff;vertical-align:2px}
+.selo.vi{background:var(--vinho)}
+.conta{font-size:14px;color:var(--texto-3);margin:-8px 0 0}
+.carregando{color:var(--texto-3);font-size:15px;padding:40px 0;text-align:center}
+/* cartões pequenos (pessoas e disciplinas): o mesmo cartão, com a imagem baixa */
+.sis-grade.mini{grid-template-columns:repeat(auto-fill,minmax(min(100%,228px),1fr));gap:16px}
+.sis-card.mini{padding:12px 12px 14px;gap:8px;border-radius:14px}
+.sis-card.mini .sis-img{border-radius:10px}
+.sis-card.mini .sis-tag{font-size:12px;padding:4px 10px}
+.sis-card.mini .sis-ir{font-size:12px}
+.sis-card.mini .sis-marca b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sis-card .sis-t{overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sis-card .sis-marca b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sis-ir{text-align:left}
+/* mostrar mais */
+.mais{grid-column:1 / -1;justify-self:start;align-self:start;display:inline-flex;align-items:center;gap:8px;border:1.3px solid var(--sf);background:#fff;color:var(--sf);border-radius:999px;padding:8px 18px;font-size:14px;font-weight:600;cursor:pointer}
+.mais:hover{background:var(--sp)}
+.mais .ic{width:16px;height:16px}
+/* botões de escolha: semestre, categoria, situação */
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips .rot{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--texto-3);margin-right:2px}
+.chip{border:1.3px solid var(--sf);background:#fff;color:var(--sf);border-radius:999px;padding:5px 14px;font-size:14px;cursor:pointer;font-variant-numeric:tabular-nums}
+.chip:hover{background:var(--sp)}
+.chip[aria-pressed="true"]{background:var(--sf);color:#fff;font-weight:600}
+.chip:disabled{opacity:.4;cursor:default;background:#fff}
+/* quadro branco das páginas de registro */
+.quadro{background:var(--cartao);border:1px solid var(--borda);border-radius:var(--raio);padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.quadro>h3{font-size:18px}
+.quadro>h3::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--sc);margin-right:8px}
+.dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr));gap:14px 24px;margin:0}
+.dl div{min-width:0}
+.dl dt{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--texto-3)}
+.dl dd{margin:2px 0 0;font-size:15px;overflow-wrap:anywhere}
+.dl .larga{grid-column:1 / -1}
+.lig{font:inherit;color:var(--petroleo);font-weight:600;background:none;border:0;border-bottom:1px solid var(--cinza);padding:0;cursor:pointer;text-align:left}
+.lig:hover{border-bottom-color:var(--terracota);color:var(--terracota)}
+.dica{font-size:14px;color:var(--texto-3)}
+.mt b .lig{font-weight:500}
+.alerta{display:flex;gap:10px;align-items:flex-start;background:var(--pastel-vi);border-radius:10px;padding:10px 14px;font-size:14px}
+.alerta .ic{color:var(--vinho);width:18px;height:18px;margin-top:2px}
+.alerta b{color:var(--vinho)}
+/* aviso em caixa (o nome .nota fica para a segunda linha das células de tabela, como na casca) */
+.aviso{display:flex;gap:10px;align-items:flex-start;background:var(--pastel-az);border-radius:10px;padding:10px 14px;font-size:14px}
+.aviso .ic{color:var(--petroleo);width:18px;height:18px;margin-top:2px}
+table.q td .lig{font-weight:600}
+table.q td.n,table.q th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tabwrap.livre{max-height:none}
+/* ── Pastilhas ou planilha: o botão fica ao lado do título das páginas de seção (segunda camada) e da busca ── */
+.alterna{margin-left:auto;flex:0 0 auto;display:inline-flex;gap:2px;padding:2px;border:1.3px solid var(--sf);border-radius:999px;background:#fff}
+.alt{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;background:none;color:var(--sf);border-radius:999px;padding:5px 14px;font:inherit;font-size:14px;line-height:1.3;cursor:pointer;white-space:nowrap}
+.alt .ic{width:15px;height:15px;color:inherit}
+.alt:hover{background:var(--sp)}
+.alt[aria-pressed="true"]{background:var(--sf);color:#fff;font-weight:600}
+@media (max-width:560px){.cab{flex-wrap:wrap} .alterna{margin-left:0;width:100%} .alt{flex:1;padding:8px 10px}}
+/* ── Planilha: a tabela da casca, com o cabeçalho preso à página, ordenação pelo título e a primeira coluna como botão ── */
+.pl{display:flex;flex-direction:column;gap:8px;min-width:0}
+.pl-info{font-size:13px;color:var(--texto-3);margin:0}
+.tabwrap.plan{overflow:visible;max-height:none}
+.tabwrap.plan table.q th{top:calc(var(--safe-t) + var(--topo) + var(--onda) + var(--menu) - 2px);padding:0}
+.tabwrap.plan table.q th:first-child{border-top-left-radius:9px}
+.tabwrap.plan table.q th:last-child{border-top-right-radius:9px}
+.tabwrap.plan table.q tbody tr:last-child td{border-bottom:0}
+.tabwrap.plan table.q tbody tr:last-child td:first-child{border-bottom-left-radius:9px}
+.tabwrap.plan table.q tbody tr:last-child td:last-child{border-bottom-right-radius:9px}
+/* planilha mais larga que a página: rola dentro da própria moldura, com o cabeçalho preso nela */
+.tabwrap.plan.rola{overflow:auto;max-height:min(70vh,640px)}
+.tabwrap.plan.rola table.q th{top:0}
+.ord{display:flex;align-items:center;gap:5px;width:100%;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;text-align:left;background:none;border:0;margin:0;padding:10px 14px;cursor:pointer;white-space:nowrap}
+th.n .ord{flex-direction:row-reverse;justify-content:flex-start}                /* o título de número encosta à direita, como os números */
+.tabwrap.plan table.q th.n,.tabwrap.plan table.q td.n,.tabwrap.plan table.q td.nq{width:1%}   /* colunas curtas ficam do tamanho do conteúdo; o texto fica com o resto */
+.tabwrap.plan table.q td.tx:first-child{min-width:240px}                                      /* a coluna que dá nome à linha não fica espremida */
+.tabwrap.plan.rola table.q td.tx{min-width:168px}
+.ord .ic{width:12px;height:12px;color:var(--cinza)}
+.ord:hover,th[aria-sort="ascending"] .ord,th[aria-sort="descending"] .ord{color:var(--petroleo)}
+th[aria-sort="ascending"] .ord .ic,th[aria-sort="descending"] .ord .ic{color:var(--sc)}
+.ord:focus-visible{outline-offset:-3px}
+table.q td.nq{white-space:nowrap}
+table.q tr.clic{cursor:pointer}
+table.q tbody tr.clic:hover td{background:var(--sp)}
+.abre{font:inherit;color:inherit;background:none;border:0;margin:0;padding:0;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:var(--cinza);text-decoration-thickness:1px;text-underline-offset:3px}
+tr.clic:hover .abre,.abre:focus-visible{text-decoration-color:var(--sc)}
+@media (max-width:820px){
+  .tabwrap.plan table.q th{top:calc(var(--safe-t) + var(--topo) + var(--onda) + 44px)}
+  .tabwrap.plan.rola table.q th{top:0}
+  /* no celular, a primeira coluna acompanha a rolagem para o lado */
+  .tabwrap.plan.rola table.q th:first-child,.tabwrap.plan.rola table.q td:first-child{position:sticky;left:0;z-index:1;background:var(--cartao);box-shadow:1px 0 0 var(--linha)}
+  .tabwrap.plan.rola table.q td.tx:first-child{min-width:min(44vw,190px)}
+  .tabwrap.plan.rola table.q th:first-child{z-index:3}
+}
+/* grade da semana: uma célula por aula da grade oficial */
+.ghwrap{overflow:auto;border:1px solid var(--borda);border-radius:10px}
+table.gh{border-collapse:separate;border-spacing:0;width:100%;min-width:680px;font-size:13px;table-layout:fixed}
+table.gh th{background:var(--cartao);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--texto-3);padding:6px;border-bottom:2px solid var(--petroleo);text-align:center}
+table.gh th.h{width:92px;text-align:left;padding-left:12px}
+table.gh td{border-bottom:1px solid var(--linha);border-left:1px solid var(--linha);padding:2px 3px;height:27px;vertical-align:middle;text-align:center;background:var(--cartao)}
+table.gh td.h{border-left:0;text-align:left;padding-left:12px;color:var(--texto-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+table.gh td.h b{color:var(--texto-2);font-weight:600}
+table.gh tr.inter td{background:#FAFBFC}
+table.gh tr.turno td{border-top:2px solid var(--grade)}
+table.gh .oc{display:block;background:var(--s8-f);color:#fff;border-radius:5px;padding:2px 4px;font:inherit;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border:0;width:100%}
+table.gh .oc.dup{background:var(--vinho)}
+/* mapa esquemático */
+.mapawrap{overflow:auto;border-radius:10px;background:var(--pastel-az)}
+.mapa-svg{width:100%;min-width:480px;height:auto;display:block;margin:0 auto}
+.mapa-sol{display:grid;grid-template-columns:minmax(0,780px) minmax(240px,1fr);gap:24px;align-items:start}
+.mapa-sol .mapawrap{background:#fff;border:1px solid var(--borda)}
+.mapa-sol .mapa-svg{min-width:600px;max-width:780px}
+.mapa-svg .sol{cursor:pointer;outline:none}
+.mapa-svg .sol path{fill:var(--s2-f);stroke:#fff;stroke-width:.7;stroke-linejoin:round;transition:fill .12s}
+.mapa-svg .sol:hover path,.mapa-svg .sol:focus path,.mapa-svg .sol.on path{fill:var(--vinho)}
+.mapa-svg .sol text{font-family:var(--fonte);font-weight:600;pointer-events:none}
+.mapa-svg .sol text.s{fill:#fff}
+.mapa-svg .sol text.p,.mapa-svg .sol text.f{fill:var(--petroleo);paint-order:stroke;stroke:#fff;stroke-width:1.1px;stroke-linejoin:round}
+.mapa-svg .sol:hover text.p,.mapa-svg .sol:hover text.f,.mapa-svg .sol:focus text.f,.mapa-svg .sol.on text.f{fill:var(--vinho)}
+.mapa-svg .sol.ap circle{fill:#fff;stroke:var(--terracota);stroke-width:.9}
+.mapa-svg .sol.ap:hover circle,.mapa-svg .sol.ap:focus circle,.mapa-svg .sol.ap.on circle{fill:var(--vinho)}
+.mapa-svg .sol.ap rect{fill:#fff;stroke:var(--petroleo);stroke-width:.35}
+.mapa-svg .sol.ap text{fill:var(--petroleo)}
+.mapa-svg .sol.ap:hover rect,.mapa-svg .sol.ap:focus rect,.mapa-svg .sol.ap.on rect{stroke:var(--vinho)}
+.mapa-svg .sol.ap:hover text,.mapa-svg .sol.ap:focus text,.mapa-svg .sol.ap.on text{fill:var(--vinho)}
+.mapa-cel{display:none;font-size:13px;color:var(--texto-3);margin:0}
+@media (max-width:760px){.mapa-cel{display:block}}
+.mapa-svg .sol:focus-visible path,.mapa-svg .sol.ap:focus-visible circle{stroke:var(--terracota);stroke-width:1.4}
+.mapa-svg .rosa{font-family:var(--fonte);font-weight:600;fill:var(--petroleo)}
+.mapa-lado{display:flex;flex-direction:column;gap:14px;position:sticky;top:calc(var(--topo) + var(--onda) + 64px)}
+.mapa-info{border-left:4px solid var(--s2);background:var(--pastel-az);border-radius:0 10px 10px 0;padding:12px 14px;min-height:118px}
+.mapa-info .rot{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--texto-3)}
+.mapa-info b{display:block;font-size:20px;color:var(--petroleo);margin:2px 0 4px}
+.mapa-info p{margin:0;font-size:14px;color:var(--texto-2)}
+.mapa-leg{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--texto-2)}
+.mapa-leg li{display:flex;gap:10px;align-items:flex-start}
+.mapa-leg i{flex:0 0 auto;width:22px;height:14px;border-radius:3px;margin-top:2px;background:var(--s2-f)}
+.mapa-leg i.ap{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--terracota);margin:2px 4px 0}
+@media (max-width:1000px){.mapa-sol{grid-template-columns:1fr} .mapa-lado{position:static}}
+.mapa-svg .pino{cursor:pointer}
+.mapa-svg .pino circle{fill:var(--s2);stroke:#fff;stroke-width:2}
+.mapa-svg .pino:hover circle,.mapa-svg .pino:focus circle{fill:var(--vinho)}
+.mapa-svg .pino text{font-family:var(--fonte);font-size:13px;font-weight:600;fill:var(--petroleo);paint-order:stroke;stroke:var(--pastel-az);stroke-width:3px;stroke-linejoin:round}
+.planta-bl{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,300px);gap:20px;align-items:start}
+.mapawrap.pl{background:#fff;border:1px solid var(--borda)}
+.planta-svg{width:100%;height:auto;max-height:max(82vh,600px);min-width:540px;display:block;margin:0 auto}
+.planta-svg .contorno{fill:#F4F5F6}
+.planta-svg .proj{fill:none;stroke:var(--cinza);stroke-width:2.5;stroke-dasharray:8 6;pointer-events:none}
+.planta-svg .par{fill:var(--petroleo);pointer-events:none}
+.planta-svg .solbl{fill:none;stroke:var(--terracota);stroke-width:3;stroke-dasharray:10 6;pointer-events:none}
+.planta-svg .sala{cursor:pointer;outline:none}
+.planta-svg .sala path,.planta-svg .sala circle{stroke:#fff;stroke-width:1.5;transition:fill .12s}
+.planta-svg .sala circle{stroke:var(--petroleo);stroke-width:2.5}
+/* cores das salas por uso: tons claros das cores das seções do portal (a aprovar) */
+:root{--pl-aula:#C9D6EA;--pl-lab:#F1DB9C;--pl-prof:#C6E0D1;--pl-adm:#E9C9CF;--pl-est:#BCE0E0;--pl-apo:#E1E5E9}
+.planta-svg .sala.c-aula path,.planta-svg .sala.c-aula circle{fill:var(--pl-aula)} .leg-planta i.c-aula{background:var(--pl-aula)}
+.planta-svg .sala.c-lab path,.planta-svg .sala.c-lab circle{fill:var(--pl-lab)} .leg-planta i.c-lab{background:var(--pl-lab)}
+.planta-svg .sala.c-prof path,.planta-svg .sala.c-prof circle{fill:var(--pl-prof)} .leg-planta i.c-prof{background:var(--pl-prof)}
+.planta-svg .sala.c-adm path,.planta-svg .sala.c-adm circle{fill:var(--pl-adm)} .leg-planta i.c-adm{background:var(--pl-adm)}
+.planta-svg .sala.c-est path,.planta-svg .sala.c-est circle{fill:var(--pl-est)} .leg-planta i.c-est{background:var(--pl-est)}
+.planta-svg .sala.c-apo path,.planta-svg .sala.c-apo circle{fill:var(--pl-apo)} .leg-planta i.c-apo{background:var(--pl-apo)}
+.planta-svg .sala.c-sem path,.planta-svg .sala.c-sem circle{fill:#fff;stroke:var(--cinza);stroke-dasharray:4 3} .leg-planta i.c-sem{background:#fff;border:1.5px dashed var(--cinza)}
+.planta-svg .sala.c-out path,.planta-svg .sala.c-out circle{fill:#F4F5F6;stroke:#F4F5F6} .leg-planta i.c-out{background:#F4F5F6;border:1px solid var(--borda)}
+.planta-svg .sala:hover path,.planta-svg .sala:focus path,.planta-svg .sala.on path,.planta-svg .sala:hover circle,.planta-svg .sala:focus circle,.planta-svg .sala.on circle{fill:var(--terracota);stroke:#fff;stroke-dasharray:none}
+.planta-svg .sala.alvo path,.planta-svg .sala.alvo circle{fill:var(--vinho);stroke:#fff;stroke-dasharray:none}
+.planta-svg .sala.nl{cursor:help}
+.planta-svg .cod{font-family:var(--fonte);font-weight:600;fill:var(--petroleo);text-anchor:middle;pointer-events:none}
+.planta-svg .cod.claro{fill:#fff}
+.planta-svg .rosa{font-family:var(--fonte);font-weight:600;fill:var(--petroleo)}
+.abas-pav{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.abas-pav button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--borda);background:#fff;color:var(--texto-2);border-radius:999px;padding:5px 14px;cursor:pointer}
+.abas-pav button[aria-pressed="true"]{background:var(--s2-f);border-color:var(--s2-f);color:#fff}
+.abas-pav button:disabled{cursor:not-allowed;color:var(--texto-3);background:var(--cinza-claro);border-style:dashed}
+.abas-pav .nota{font-size:13px;color:var(--texto-3)}
+.leg-planta{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:6px;font-size:13px;color:var(--texto-2)}
+.leg-planta li{display:flex;gap:8px;align-items:center}
+.leg-planta i{flex:0 0 auto;width:18px;height:12px;border-radius:3px}
+.leg-planta b{margin-left:auto;font-weight:600;color:var(--texto-3);font-variant-numeric:tabular-nums}
+@media (max-width:1000px){.planta-bl{grid-template-columns:1fr}}
+.leg.cores{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 16px}
+@media (max-width:480px){.quadro{padding:14px} .dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px} .meta4{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .mt{padding:10px 12px}}
+</style>
+
+<header class="topo">
+  <a class="marca-ct" href="https://www.ct.ufpb.br/" target="_blank" rel="noopener" title="Centro de Tecnologia da UFPB"><img src="data:image/png;base64,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" alt="Centro de Tecnologia UFPB"></a>
+  <a class="titulo-rel" href="#inicio" data-ir="inicio" title="Voltar ao início">
+    <h1>Espaços do CT</h1>
+    <span>Direção do CT · Protótipo do portal</span>
+  </a>
+  <label class="campo" for="q" role="search">
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></svg>
+    <span class="so-leitor">Buscar no portal</span>
+    <input id="q" type="search" placeholder="Buscar sala, bloco, setor, pessoa ou disciplina" autocomplete="off">
+  </label>
+  <a class="insta" href="https://www.instagram.com/ctufpb/" target="_blank" rel="noopener" title="Instagram do CT/UFPB">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v12H3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg><span>@ctufpb</span>
+  </a>
+  <svg class="onda-topo" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 52 C 260 18 520 20 760 40 C 1010 61 1230 30 1440 14 L1440 90 L0 90 Z" fill="#C9D5DE"/>
+    <path d="M0 64 C 300 40 560 44 820 56 C 1080 68 1280 46 1440 36 L1440 90 L0 90 Z" fill="#4D6B7E"/>
+    <path d="M0 76 C 320 60 640 64 900 70 C 1140 76 1320 64 1440 58 L1440 90 L0 90 Z" fill="#283E4C"/>
+  </svg>
+</header>
+
+<div class="casca">
+  <nav class="lateral menubar" id="menu" aria-label="Seções do portal"></nav>
+  <div class="principal">
+    <main class="conteudo" id="main">
+      <section class="secao" id="tela"><p class="carregando">Carregando os dados do protótipo…</p></section>
+    </main>
+    <footer class="rodape">
+      <svg class="onda" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 52 C 260 18 520 20 760 40 C 1010 61 1230 30 1440 14 L1440 90 L0 90 Z" fill="#C9D5DE"/>
+        <path d="M0 64 C 300 40 560 44 820 56 C 1080 68 1280 46 1440 36 L1440 90 L0 90 Z" fill="#4D6B7E"/>
+        <path d="M0 76 C 320 60 640 64 900 70 C 1140 76 1320 64 1440 58 L1440 90 L0 90 Z" fill="#283E4C"/>
+      </svg>
+      <div class="rodape-corpo">
+        <a class="rodape-marca" href="https://www.ufpb.br/" target="_blank" rel="noopener" title="Universidade Federal da Paraíba"><img src="data:image/png;base64,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" alt="Brasão da UFPB" width="178" height="240"></a>
+        <div class="rodape-tx">
+          <b class="rodape-t">Espaços do CT · protótipo do portal</b>
+          <p>Universidade Federal da Paraíba · Centro de Tecnologia · Direção de Centro. Mostra como a comunidade navegaria pelos espaços do CT: blocos, salas, setores, pessoas, aulas, demandas e eventos.</p>
+          <p class="rodape-nota" id="rodapeDados">Protótipo com dados das planilhas da Direção. Em caso de divergência, vale a informação do sistema oficial.</p>
+          <nav class="rodape-links" aria-label="Links do rodapé"><a href="https://www.ct.ufpb.br/" target="_blank" rel="noopener">Site do CT</a><a href="https://www.instagram.com/ctufpb/" target="_blank" rel="noopener">Instagram @ctufpb</a><a href="#sobre" data-ir="sobre">Sobre o protótipo</a></nav>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script>
+/* ===== Utilidades ===== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=(n,d=0)=>n==null||n===""||isNaN(n)?"–":Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const m2=n=>n==null||n===""?"–":fmt(n,n<1000?1:0)+" m²";
+const pct=(a,b)=>b?Math.round(a/b*100)+"%":"–";
+const sa=s=>String(s??"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const sl=s=>sa(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");            /* endereço só com letras, números e hífens */
+const soma=(l,f)=>l.reduce((s,x)=>s+(+f(x)||0),0);
+const conta=(l,f)=>{const m=new Map();l.forEach(x=>{const k=f(x);m.set(k,(m.get(k)||0)+1)});return m};
+const agrupa=(l,f)=>{const m=new Map();l.forEach(x=>{const k=f(x);(m.get(k)||m.set(k,[]).get(k)).push(x)});return m};
+const maiores=(m,n)=>[...m].sort((a,b)=>b[1]-a[1]).slice(0,n);
+const plural=(n,um,varios)=>fmt(n)+" "+(n===1?um:varios);
+const juntar=l=>l.length<=1?l.join(""):l.slice(0,-1).join(", ")+" e "+l[l.length-1];
+const curto=(t,n)=>{t=String(t||"");if(t.length<=n)return t;const c=t.slice(0,n+1),i=c.lastIndexOf(" ");return(i>n*0.5?c.slice(0,i):t.slice(0,n)).replace(/[\s,;·-]+$/,"")+"…"};
+const ordAlf=(a,b)=>sa(a).localeCompare(sa(b),"pt-BR",{numeric:true});
+const MIN=new Set("de da do das dos e em na no nas nos a o as os para por com ao aos à às um uma sem sob entre".split(" "));
+const SIG=new Set("TCC CAD CAE CAM CNC BIM EAD TI CT UFPB SIG PPG GD MEV DRX TG CLP UTI".split(" "));
+function nm(s){if(!s)return"";return String(s).toLowerCase().split(/(\s+|-|\/|\(|\)|,)/).map((w,i)=>{if(!w.trim()||/^[-\/(),]$/.test(w))return w;const up=w.toUpperCase();
+  if(/^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/.test(w)&&i>0)return up;if(SIG.has(up)||/\d/.test(w))return up;if(i>0&&MIN.has(w))return w;return w.charAt(0).toUpperCase()+w.slice(1)}).join("")}
+
+/* ===== Ícones ===== */
+const IC={
+  casa:"M3 11l9-8 9 8M5 10v10h14V10",
+  predio:"M4 21V5l8-3 8 3v16M9 21v-4h6v4M8 8h.01M12 8h.01M16 8h.01M8 12h.01M12 12h.01M16 12h.01",
+  grade4:"M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
+  setores:"M12 3v5M5 13V8h14v5M5 13v6M12 8v11M19 13v6",
+  pessoas:"M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M22 21a7 7 0 0 0-5-6.7",
+  pessoa:"M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0z",
+  cap:"M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5M22 9v6",
+  livro:"M12 6.5C10.5 5 8 4.5 3 4.5v14c5 0 7.5.5 9 2 1.5-1.5 4-2 9-2v-14c-5 0-7.5.5-9 2zM12 6.5v14",
+  prancheta:"M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h6",
+  agenda:"M4 5h16v16H4zM4 10h16M8 3v4M16 3v4M8 14h3v3H8z",
+  alerta:"M12 9v4M12 17h.01M10.3 3.9L2.4 17.5a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z",
+  info:"M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 11v6M12 7.5v.5",
+  busca:"M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4",
+  frasco:"M9 2h6M10 2v6L4 20h16L14 8V2",
+  monitor:"M3 4h18v12H3zM8 20h8M12 16v4",
+  gota:"M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z",
+  xicara:"M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 9h2a2 2 0 0 1 0 5h-2M7 3v2M11 3v2",
+  caixa:"M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10",
+  pasta:"M3 6h6l2 2h10v12H3zM8 14h8",
+  porta:"M4 21h16M6 21V3h10v18M16 6h2v15M12.5 12v.01",
+  bandeira:"M5 21V4h12l-2 4 2 4H5",
+  fala:"M4 4h16v12H8l-4 4zM8 9h8M8 12h5",
+  alvo:"M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zm0-5a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-4a1 1 0 1 0 0-2",
+  arvore:"M12 22v-7M7 15a5 5 0 0 1-1-9.5 6 6 0 0 1 12 0A5 5 0 0 1 17 15z",
+  cruz:"M9 3h6v6h6v6h-6v6H9v-6H3V9h6z",
+  impressora:"M6 9V3h12v6M6 17H4V9h16v8h-2M8 14h8v7H8z",
+  talher:"M7 3v8a2 2 0 0 0 4 0V3M9 11v10M17 3c-2 2-2 7 0 9v9",
+  multimidia:"M4 5h16v11H4zM10 8.5l4 2-4 2zM8 20h8",
+  projeto:"M3 21l6-6M14 4l6 6-9 9H5v-6z",
+  chave:"M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z",
+  mais:"M12 5v14M5 12h14",
+  expandir:"M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
+  troca:"M4 8h14l-4-4M20 16H6l4 4",
+  pino:"M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12zm0-9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  regua:"M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2",
+  cadeira:"M7 4h10v8H7zM5 12h14v3H5zM7 15v5M17 15v5",
+  camadas:"M12 3l9 5-9 5-9-5zM3 13l9 5 9-5M3 17l9 5 9-5",
+  tabela:"M3 4h18v16H3zM3 10h18M9 4v16",
+  relogio:"M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2",
+  check:"M4 12l5 5L20 7",
+  seta:"M5 12h14M13 6l6 6-6 6", desce:"M7 7l10 10M17 9v8H9", fora:"M7 17L17 7M9 7h8v8", volta:"M19 12H5M11 6l-6 6 6 6", baixo:"M12 3v18M6 15l6 6 6-6", cima:"M12 21V3M6 9l6-6 6 6",
+  ordena:"M8 9l4-4 4 4M8 15l4 4 4-4", asc:"M6 15l6-6 6 6", desc:"M6 9l6 6 6-6"
+};
+const ico=(k,cls)=>`<svg class="ic${cls?" "+cls:""}" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[k]||IC.porta}"/></svg>`;
+const TIPO_IC={"Laboratório":"frasco","Ambiente de Professor":"pessoa","Banheiro":"gota","Sala de Aula":"cap","Sala de Estudos":"livro","Almoxarifado":"caixa","Administração":"pasta","Coordenação":"bandeira","Copa":"xicara","Centro Acadêmico":"fala","Auditório":"pessoas","Sala Multimídia":"multimidia","Empresa Junior":"alvo","Laboratório de Informática":"monitor","Sala de Projeto":"projeto","Biblioteca":"livro","Ambiente de Técnicos de Laboratório":"pessoa","Área de Lazer":"arvore","Clínica":"cruz","Reprografia":"impressora","Restaurante":"talher"};
+const icTipo=t=>TIPO_IC[t]||"porta";
+const SET_IC={"Laboratório":"frasco","Coordenação de curso":"cap","Programa de pós-graduação":"livro","Secretaria":"pasta","Departamento":"predio","Coordenação":"bandeira","Assessoria":"fala","Núcleo":"alvo","Centro":"predio","Direção":"bandeira","Biblioteca":"livro","Almoxarifado":"caixa","Arquivo":"caixa"};
+const DEM_IC={"Novo espaço":"mais","Ampliação":"expandir","Realocação":"troca","Melhoria de infraestrutura":"chave"};
+
+/* ===== Corujas ===== */
+const BODY='<path d="M12 10 L21 18 Q32 12 43 18 L52 10 L50.5 27 Q54 35 52 45 Q48 58 32 58 Q16 58 12 45 Q10 35 13.5 27 Z" fill="#fdf3dc" stroke="#283E4C" stroke-width="2.2" stroke-linejoin="round"/><path d="M14.5 34 Q10.5 42 16.5 51" fill="none" stroke="#283E4C" stroke-width="2" stroke-linecap="round"/><path d="M49.5 34 Q53.5 42 47.5 51" fill="none" stroke="#283E4C" stroke-width="2" stroke-linecap="round"/><path d="M24 45 q2 2 4 0 q2 2 4 0 q2 2 4 0 q2 2 4 0" fill="none" stroke="#c9a14a" stroke-width="1.5" stroke-linecap="round"/><path d="M27 50.5 q2 2 4 0 q2 2 4 0 q2 2 4 0" fill="none" stroke="#c9a14a" stroke-width="1.5" stroke-linecap="round"/><path d="M26 58 l-2 3 M28.5 58 v3 M35.5 58 v3 M38 58 l2 3" stroke="#e0a526" stroke-width="2" stroke-linecap="round"/>';
+const OLHOS='<circle cx="24.5" cy="29" r="7.2" fill="#ffffff" stroke="#283E4C" stroke-width="2"/><circle cx="39.5" cy="29" r="7.2" fill="#ffffff" stroke="#283E4C" stroke-width="2"/><circle cx="25.2" cy="29.5" r="3" fill="#283E4C"/><circle cx="40.2" cy="29.5" r="3" fill="#283E4C"/><circle cx="26.2" cy="28.4" r="1" fill="#ffffff"/><circle cx="41.2" cy="28.4" r="1" fill="#ffffff"/><path d="M29.5 35 L32 40 L34.5 35 Z" fill="#e0a526" stroke="#283E4C" stroke-width="1.2" stroke-linejoin="round"/>';
+const LIVRO='<path d="M20 42 L32 45 L44 42 L44 55 L32 58 L20 55 Z" fill="#283E4C" stroke="#283E4C" stroke-width="1.6" stroke-linejoin="round"/><path d="M32 45 V58" stroke="#fefefc" stroke-width="1.4"/><path d="M23 46 l6 1.5 M23 49.5 l6 1.5 M35 47.5 l6 -1.5 M35 51 l6 -1.5" stroke="#9fc0e8" stroke-width="1.1"/>';
+const OCULOS='<circle cx="24.5" cy="29" r="9" fill="none" stroke="#283E4C" stroke-width="2.4"/><circle cx="39.5" cy="29" r="9" fill="none" stroke="#283E4C" stroke-width="2.4"/>';
+const OWL={0:BODY+OLHOS+LIVRO,2:BODY+OLHOS+OCULOS,3:BODY+OLHOS};
+const coruja=n=>`<div class="owl"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${OWL[n]}</svg></div>`;
+
+/* ===== Dados ===== */
+let D=null, T=null, IX={}, turmasErro=false;
+const TC={sem:0,cod:1,niv:2,turma:3,hor:4,mat:5,vag:6,doc:7,local:8,idsg:9,sit:10,mod:11,tipo:12,cursos:13,pes:14};
+const SEMS=["2022.1","2022.2","2023.1","2023.2","2024.1","2024.2","2025.1","2025.2","2026.1","2026.2"];
+const NIVEL={GRAD:"Graduação",POS:"Pós-graduação",OUTRO:"Outro"};
+const rot=s=>s?(s.sigla||s.nome):"";
+const setor=id=>IX.set.get(id), amb=id=>IX.amb.get(id), pes=id=>IX.pes.get(id);
+const nomePes=p=>p?((p.trat?p.trat+" ":"")+nm(p.nome)):"";
+const nomeCurto=p=>{const w=nm(p.nome).split(/\s+/).filter(x=>x&&!MIN.has(x.toLowerCase()));return w.length>1?w[0]+" "+w[w.length-1]:(w[0]||"")};
+const local=a=>a?(String(a.cod??"").startsWith(a.bloco||"\u0000")?String(a.cod):(a.bloco||"")+(a.cod!=null&&a.cod!==""?" · sala "+a.cod:"")):"";
+const ordCod=(a,b)=>String(a.cod??"").localeCompare(String(b.cod??""),"pt-BR",{numeric:true})||ordAlf(a.id,b.id);
+function indexar(){
+  IX.amb=new Map(D.ambientes.map(a=>[a.id,a])); IX.set=new Map(D.setores.map(s=>[s.id,s])); IX.pes=new Map(D.pessoas.map(p=>[p.id,p]));
+  IX.dis=new Map(D.disciplinas.map(d=>[d.cod+"|"+d.niv,d])); IX.dem=new Map(D.demandas.map(d=>[d.id,d])); IX.blo=new Map(D.blocos.map(b=>[b.sigla,b]));
+  IX.tipo=new Map(D.tipos.map(t=>[t.tipo,t]));
+  IX.ocA=new Map(); IX.ocP=new Map();
+  D.ocupacoes.forEach(([a,p])=>{(IX.ocA.get(a)||IX.ocA.set(a,[]).get(a)).push(p);(IX.ocP.get(p)||IX.ocP.set(p,[]).get(p)).push(a)});
+  IX.ambSg=new Map(D.ambientes.filter(a=>a.sg).map(a=>[a.sg.id,a.id]));
+  IX.filhos=agrupa(D.setores.filter(s=>s.sup),s=>s.sup);
+  IX.sigla=new Map(); D.setores.forEach(s=>{if(s.sigla&&!IX.sigla.has(s.sigla))IX.sigla.set(s.sigla,s.id)});
+  IX.ambSet=agrupa(D.ambientes.filter(a=>a.setor),a=>a.setor); IX.pesSet=agrupa(D.pessoas.filter(p=>p.lot),p=>p.lot);
+  IX.demSet=agrupa(D.demandas.filter(d=>d.setor),d=>d.setor); IX.demAmb=agrupa(D.demandas.filter(d=>d.amb),d=>d.amb);
+  IX.ambBlo=agrupa(D.ambientes,a=>a.bloco); IX.ambTipo=agrupa(D.ambientes,a=>a.tipo||"");
+  IX.bloSl=new Map(D.blocos.map(b=>[sl(b.sigla),b])); IX.tipoSl=new Map([...IX.ambTipo.keys()].map(t=>[t?sl(t):"sem-tipo",t]));
+  IX.disUni=agrupa(D.disciplinas,d=>d.uni||"Sem unidade"); IX.uniSl=new Map([...IX.disUni.keys()].map(u=>[sl(u),u]));
+  IX.pend=new Map();
+  D.pendencias.forEach(p=>{String(p.id||"").split(/\s*,\s*/).filter(Boolean).forEach(i=>{const k=p.t+"|"+i;(IX.pend.get(k)||IX.pend.set(k,[]).get(k)).push(p)})});
+  const m=new Map(); D.pendencias.forEach(p=>{const k=p.t+"|"+p.p;(m.get(k)||m.set(k,{t:p.t,p:p.p,itens:[]}).get(k)).itens.push(p)});
+  IX.pendTipos=[...m.values()].sort((a,b)=>b.itens.length-a.itens.length||ordAlf(a.p,b.p));
+}
+function indexarTurmas(){
+  IX.tAmb=new Map(); IX.tDis=new Map(); IX.tPes=new Map(); IX.tSem=new Map();
+  const poe=(m,k,i)=>{(m.get(k)||m.set(k,[]).get(k)).push(i)};
+  T.forEach((t,i)=>{const a=IX.ambSg.get(t[TC.idsg]);if(a)poe(IX.tAmb,a,i);poe(IX.tDis,t[TC.cod]+"|"+t[TC.niv],i);poe(IX.tSem,t[TC.sem],i);(t[TC.pes]||[]).forEach(p=>poe(IX.tPes,p,i))});
+}
+const DIAS=["2","3","4","5","6","7"], DIA_ROT={2:"Seg",3:"Ter",4:"Qua",5:"Qui",6:"Sex",7:"Sáb"};
+const AULAS=[["M1","07:00"],["M2","08:00"],["M3","09:00"],["M4","10:00"],["M5","11:00"],["M6","12:00"],["T1","13:00"],["T2","14:00"],["T3","15:00"],["T4","16:00"],["T5","17:00"],["T6","18:00"],["N1","19:00"],["N2","19:50"],["N3","20:40"],["N4","21:30"]];
+function slots(h){const out=new Set();const re=/\b([2-7]+)([MTN])([1-6]+)\b/g;let m;while((m=re.exec(String(h||""))))for(const d of m[1])for(const a of m[3])out.add(d+m[2]+a);return out}
+const ocupaSala=t=>(t[TC.mat]||0)>0&&t[TC.mod]!=="REMOTA";
+
+/* ===== Seções: cada tipo de registro tem a sua cor ===== */
+const SECOES=[
+  {id:"blocos",n:2,ic:"predio",t:"Blocos",resumo:"Os prédios do CT: o que cada um abriga, por pavimento, e onde fica no mapa."},
+  {id:"ambientes",n:1,ic:"grade4",t:"Ambientes",resumo:"Todas as salas por tipo de espaço: laboratórios, salas de aula, ambientes de professor e os demais."},
+  {id:"setores",n:7,ic:"setores",t:"Setores",resumo:"Departamentos, coordenações, programas e laboratórios, com as salas, as pessoas e os pedidos de cada um."},
+  {id:"pessoas",n:4,ic:"pessoas",t:"Pessoas",resumo:"Servidores lotados no CT e a sala onde cada um trabalha."},
+  {id:"aulas",n:8,ic:"cap",t:"Aulas",resumo:"Disciplinas e turmas de 2022.1 a 2026.2: onde e quando acontece cada aula."},
+  {id:"demandas",n:3,ic:"prancheta",t:"Demandas",resumo:"O que os setores pediram de espaço e de melhoria, em ordem de prioridade."},
+  {id:"eventos",n:6,ic:"agenda",t:"Eventos",resumo:"Onde e quando acontece cada evento do CT. Ainda sem dados: a seção mostra o formato."},
+  {id:"corrigir",n:5,ic:"alerta",t:"A corrigir",resumo:"O que a migração encontrou de incompleto ou divergente nos cadastros."}
+];
+const SEC=Object.fromEntries(SECOES.map(s=>[s.id,s]));
+const PAI={blo:"blocos",tipo:"ambientes",amb:"ambientes",set:"setores",pes:"pessoas",uni:"aulas",dis:"aulas",dem:"demandas",pend:"corrigir"};
+$("#menu").innerHTML=`<button class="item" data-sec="inicio" title="Início">${ico("casa")}<span>Início</span></button>`+
+  SECOES.map(s=>`<button class="item" data-sec="${s.id}" data-cor="${s.n}" title="${esc(s.t)}">${ico(s.ic)}<span>${esc(s.t)}</span></button>`).join("")+
+  `<div class="sep"></div><button class="item" data-sec="sobre" title="Sobre o protótipo">${ico("info")}<span>Sobre o protótipo</span></button>`;
+
+/* ===== Estado ===== */
+let ROTA={sec:"inicio"}, BUSCA="", LIM={}, SEM="2026.2";
+const FIL={pes:"Todos",dem:"Aberta",pav:"Todos"};
+/* forma de ver as listas da segunda camada e da busca: pastilhas (cartões) ou planilha (tabela); a escolha fica guardada neste navegador */
+let VISTA="pastilhas", DICA_PL=0, MAPA=null;
+const ORD={};                                                    /* ordenação de cada planilha: {coluna, sentido} */
+try{if(localStorage.getItem("espacos-ct-vista")==="planilha")VISTA="planilha"}catch(e){}
+
+/* ===== Peças de página ===== */
+const cab=(ic,titulo,extra)=>`<div class="cab"><span class="n">${ico(ic)}</span><h2>${esc(titulo)}</h2>${extra||""}</div>`;
+const fala=(rotulo,txt,owl)=>`<div class="owlbox topo-coruja ob-grey">${coruja(owl==null?2:owl)}<div class="t"><span class="h">${esc(rotulo)}</span><p>${txt}</p></div></div>`;
+const voltar=(rota,txt)=>`<button class="voltar" type="button" data-ir="${esc(rota)}">${ico("volta")}${esc(txt)}</button>`;
+const mt=(rotulo,ic,val)=>`<div class="mt"><span>${ico(ic)}${esc(rotulo)}</span><b class="${val?"":"def"}">${val||"A informar"}</b></div>`;
+const meta4=l=>`<div class="meta4">${l.map(x=>mt(x[0],x[1],x[2])).join("")}</div>`;
+const dd=(t,v,larga)=>v==null||v===""?"":`<div class="${larga?"larga":""}"><dt>${esc(t)}</dt><dd>${v}</dd></div>`;
+const quadro=(titulo,corpo)=>`<div class="quadro">${titulo?`<h3>${esc(titulo)}</h3>`:""}${corpo}</div>`;
+const grupo=(titulo,sub,corpo)=>`<div class="grupo"><div class="grupo-t"><h3>${esc(titulo)}</h3>${sub?`<span>${esc(sub)}</span>`:""}</div>${corpo}</div>`;
+const grade=(cards,mini)=>`<div class="sis-grade${mini?" mini":""}">${cards}</div>`;
+const vazio=t=>`<div class="vazio">${esc(t)}</div>`;
+const chips=(rotulo,ops,atual,attr)=>`<div class="chips" role="group" aria-label="${esc(rotulo)}"><span class="rot">${esc(rotulo)}</span>${ops.map(o=>{const[v,t,off]=Array.isArray(o)?o:[o,o];return`<button class="chip" type="button" data-${attr}="${esc(v)}" aria-pressed="${v===atual}" ${off?"disabled":""}>${esc(t)}</button>`}).join("")}</div>`;
+const ligSet=id=>{const s=setor(id);return s?`<button class="lig" type="button" data-ir="set-${esc(id)}" title="${esc(s.nome)}">${esc(rot(s))}</button>`:""};
+const ligAmb=id=>{const a=amb(id);return a?`<button class="lig" type="button" data-ir="amb-${esc(id)}" title="${esc(a.nome||"")}">${esc(local(a)||id)}</button>`:esc(id||"")};
+const ligPes=id=>{const p=pes(id);return p?`<button class="lig" type="button" data-ir="pes-${esc(id)}">${esc(nomePes(p))}</button>`:esc(id||"")};
+const tag=(t,c)=>t?`<span class="pill ${c||"p-cz"}">${esc(t)}</span>`:"";
+const SIT_COR={"Em uso":"p-az","Vago":"p-tc","Devolvido pelo CEAR":"p-tc","A demolir":"p-vi","Em manutenção":"p-vi"};
+const DEM_COR={"Aberta":"p-tc","Atendida":"p-vd","Agregada":"p-az","Retirada":"p-cz"};
+const tom=i=>`color-mix(in srgb,var(--sf) ${[100,90,82,75,70,66][Math.min(i,5)]}%,#fff)`;
+function pagina(lista,chave,ini,passo,f){
+  let n=LIM[chave]||ini; if(lista.length-n<=3)n=lista.length;
+  const vis=lista.slice(0,n), resto=lista.length-vis.length;
+  return vis.map(f).join("")+(resto>0?`<button class="mais" type="button" data-mais="${esc(chave)}" data-n="${n+passo}">${ico("baixo")}Mostrar mais ${fmt(Math.min(passo,resto))} de ${fmt(resto)}</button>`:"");
+}
+
+/* ===== Cartão: um só modelo; a cor diz o tipo de registro ===== */
+function card(o){
+  const ic=ico(o.ic), tg=o.ir?"button":(o.href?"a":"div");
+  const at=o.ir?`type="button" data-ir="${esc(o.ir)}"`:(o.href?`href="${esc(o.href)}" target="_blank" rel="noopener"`:"");
+  return `<${tg} class="sis-card${o.mini?" mini":""}${o.sem?" sem":""}" data-cor="${o.cor}" ${at} title="${esc(o.dica||o.t)}">
+    <span class="sis-img" aria-hidden="true"><span class="sis-marca">${ic}<b>${esc(o.marca)}</b></span><span class="sis-fundo">${ic}</span></span>
+    <span class="sis-tags">${(o.tags||[]).filter(Boolean).map(t=>`<span class="sis-tag">${esc(t)}</span>`).join("")}${(o.pills||[]).filter(Boolean).map(p=>`<span class="pill ${p[1]}">${esc(p[0])}</span>`).join("")}</span>
+    <span class="sis-t">${esc(o.t)}</span>${o.d?`<span class="sis-d">${esc(o.d)}</span>`:""}
+    <span class="sis-ir">${esc(o.pe||"")} ${o.ir?ico(o.seta||"desce"):(o.href?ico("fora"):"")}</span>
+  </${tg}>`;
+}
+const pendN=(t,id)=>(IX.pend.get(t+"|"+id)||[]).length;
+const pilConf=(t,id)=>pendN(t,id)?["A conferir","p-vi"]:null;
+function cBloco(b){
+  const as=IX.ambBlo.get(b.sigla)||[], ts=maiores(conta(as.filter(a=>a.tipo),a=>a.tipo),2), pv=new Set(as.map(a=>a.pav).filter(Boolean)).size;
+  return card({ir:"blo-"+sl(b.sigla),cor:2,ic:"predio",marca:b.sigla,tags:[plural(as.length,"ambiente","ambientes")],pills:[b.lat==null?["Sem coordenada","p-cz"]:null],
+    t:b.nome||b.sigla,d:[m2(soma(as,a=>a.area)),plural(pv,"pavimento","pavimentos"),ts.map(x=>`${x[0]} (${x[1]})`).join(", ")].filter(Boolean).join(" · "),pe:"Abrir o bloco"});
+}
+function cAmb(a){
+  const s=setor(a.setor);
+  return card({ir:"amb-"+a.id,cor:1,ic:icTipo(a.tipo),marca:local(a)||a.id,tags:[a.tipo||"Sem tipo"],pills:[a.sit&&a.sit!=="Em uso"?[a.sit,SIT_COR[a.sit]||"p-cz"]:null,pilConf("Ambiente",a.id)],
+    t:a.nome||"(sem nome)",d:[s?rot(s):"sem setor",a.cap?plural(a.cap,"lugar","lugares"):null,a.area!=null?m2(a.area):null].filter(Boolean).join(" · "),pe:"Abrir a sala",dica:a.ident||a.nome||a.id});
+}
+function cTipo(t){
+  const as=IX.ambTipo.get(t)||[], nb=new Set(as.map(a=>a.bloco)).size, maior=maiores(conta(as,a=>a.bloco),1)[0];
+  return card({ir:"tipo-"+(t?sl(t):"sem-tipo"),cor:1,ic:t?icTipo(t):"alerta",marca:t||"Sem tipo",tags:[plural(as.length,"ambiente","ambientes")],pills:[t?null:["A conferir","p-vi"]],
+    t:t||"Sem tipo de espaço",d:`${m2(soma(as,a=>a.area))} em ${plural(nb,"bloco","blocos")}${maior&&nb>1?` · mais no ${maior[0]} (${maior[1]})`:""}`,pe:"Ver os ambientes"});
+}
+function cSetor(s){
+  const as=IX.ambSet.get(s.id)||[], ps=IX.pesSet.get(s.id)||[], nd=(IX.demSet.get(s.id)||[]).filter(d=>d.sit==="Aberta").length;
+  return card({ir:"set-"+s.id,cor:7,ic:SET_IC[s.tipo]||"setores",marca:s.sigla||curto(s.nome,34),tags:[s.tipo],pills:[s.ct==="Não"?["Fora do CT","p-cz"]:null],
+    t:s.nome,d:[as.length?plural(as.length,"ambiente","ambientes")+" · "+m2(soma(as,a=>a.area)):"sem ambiente no inventário",ps.length?plural(ps.length,"pessoa","pessoas"):null,nd?plural(nd,"demanda aberta","demandas abertas"):null].filter(Boolean).join(" · "),pe:"Abrir o setor"});
+}
+function cPessoa(p){
+  const as=(IX.ocP.get(p.id)||[]).map(amb).filter(Boolean);
+  return card({ir:"pes-"+p.id,cor:4,ic:"pessoa",mini:1,marca:nomeCurto(p),tags:[p.cat==="Técnico Administrativo"?"Técnico":p.cat],pills:[as.length?null:["Sem sala","p-cz"],p.situ&&p.situ!=="Lotado"?["Desligado","p-vi"]:null],
+    t:nomePes(p),pe:[rot(setor(p.lot)),as.length?local(as[0])+(as.length>1?" +"+(as.length-1):""):null].filter(Boolean).join(" · ")});
+}
+function cDis(d){
+  const todas=T?(IX.tDis.get(d.cod+"|"+d.niv)||[]):[], doSem=todas.filter(i=>T[i][TC.sem]===SEM);
+  return card({ir:"dis-"+d.cod+"-"+d.niv,cor:8,ic:"livro",mini:1,marca:d.cod,tags:[d.niv==="POS"?"Pós":NIVEL[d.niv]],pills:[d.adeq?null:["Sala a definir","p-vi"]],
+    t:nm(d.nome),pe:T?(doSem.length?plural(doSem.length,"turma","turmas")+" em "+SEM:plural(todas.length,"turma","turmas")+" no período"):(d.uni||"")});
+}
+function cDem(d){
+  const s=setor(d.setor), pr=String(d.prio||"").split(" · ")[0];
+  return card({ir:"dem-"+d.id,cor:3,ic:DEM_IC[d.nat]||"prancheta",marca:d.id+(pr?" · "+pr:""),tags:[d.tipo],pills:[d.sit!=="Aberta"?[d.sit,DEM_COR[d.sit]||"p-cz"]:null,d.tipo&&!IX.tipo.has(d.tipo)?["Tipo fora da lista","p-vi"]:null],
+    t:d.titulo,d:[s?rot(s):"sem setor do SIPAC",d.nat,d.area!=null&&d.area!==""?fmt(+d.area,0)+" m²":null].filter(Boolean).join(" · "),pe:"Abrir a demanda"});
+}
+function cPend(k,i){
+  const n=k.itens.length, ds=new Set(k.itens.map(x=>x.d||""));
+  return card({ir:"pend-"+(i+1),cor:5,ic:"alerta",marca:fmt(n),tags:[k.t],t:k.p,d:ds.size===1?[...ds][0]:"Cada registro tem a sua anotação.",pe:n===1?"Ver o registro":"Ver os "+fmt(n)+" registros"});
+}
+const nomeUni=u=>{u=String(u||"");const i=u.indexOf("/");return i>0?u.slice(0,i).toUpperCase()+" · "+nm(u.slice(i+1)):u};   /* "CCEN/QUÍMICA" vira "CCEN · Química"; siglas ficam como estão */
+function dadosUni(u){
+  const ds=IX.disUni.get(u)||[], sid=IX.sigla.get(u), s=sid&&setor(sid);
+  let nt=0, nd=0, mat=0, lig=0;
+  if(T)ds.forEach(d=>{const l=(IX.tDis.get(d.cod+"|"+d.niv)||[]).filter(i=>T[i][TC.sem]===SEM);if(l.length)nd++;nt+=l.length;l.forEach(i=>{mat+=T[i][TC.mat]||0;if(IX.ambSg.has(T[i][TC.idsg]))lig++})});
+  return{u,s,ds,nt,nd,mat,lig};
+}
+function cUni(x){
+  const u=x.u, s=x.s;
+  return card({ir:"uni-"+sl(u),cor:8,ic:s?(SET_IC[s.tipo]||"cap"):"cap",marca:s?s.sigla:curto(nomeUni(u),34),tags:[T?plural(x.nt,"turma","turmas"):plural(x.ds.length,"disciplina","disciplinas")],pills:[s?null:["Outro centro","p-cz"]],
+    t:s?s.nome:nomeUni(u),d:T?`${plural(x.nd,"disciplina","disciplinas")} em ${SEM} · ${fmt(x.mat)} matrículas · ${pct(x.lig,x.nt)} das turmas com sala ligada`:plural(x.ds.length,"disciplina","disciplinas")+" no período",pe:"Ver as disciplinas"});
+}
+const kUni=()=>({
+  u:{k:"u",t:"Unidade",nq:1,v:x=>x.s?x.s.sigla:nomeUni(x.u),h:x=>esc(x.s?x.s.sigla:nomeUni(x.u))+(x.s?"":' <span class="pill p-cz">Outro centro</span>')},
+  nome:{k:"nome",t:"Nome",v:x=>x.s?x.s.nome:""},
+  nd:{k:"nd",t:"Disciplinas em "+SEM,n:1,v:x=>x.nd},
+  nt:{k:"nt",t:"Turmas em "+SEM,n:1,v:x=>x.nt},
+  mat:{k:"mat",t:"Matrículas",n:1,v:x=>x.mat},
+  lig:{k:"lig",t:"Turmas com sala ligada",n:1,v:x=>x.nt?Math.round(x.lig/x.nt*100):null,h:x=>x.nt?`${fmt(x.lig)} (${pct(x.lig,x.nt)})`:""}
+});
+function faixas(gs){
+  return `<div class="ciclo-wrap fx-wrap"><div class="ciclo fx">${gs.map((g,i)=>(i?`<div class="fx-liga">${g.liga?ico(g.ligaIc||"baixo")+`<span>${esc(g.liga)}</span>`:""}</div>`:"")+
+    `<div class="fx-passo" style="--pc:${g.cor||tom(i)}"><div class="fx-ini"><div class="fx-rot"><span class="passo-n">${esc(g.n)}</span><h3>${esc(g.rot)}</h3></div>
+      <div class="fx-esq"><p class="fx-q">${esc(g.q)}</p><p class="fx-tx">${g.tx}</p>${g.fim?`<p class="fx-fim"><span>${esc(g.fim[0])}</span>${g.fim[1]}</p>`:""}</div></div>
+      <div class="fx-cards">${g.cards}</div></div>`).join("")}</div></div>`;
+}
+function alertas(t,id){
+  const ps=IX.pend.get(t+"|"+id)||[];
+  return ps.length?quadro("A conferir neste cadastro",ps.map(p=>`<div class="alerta">${ico("alerta")}<div><b>${esc(p.p)}</b>${p.d?"<br>"+esc(p.d):""}</div></div>`).join("")):"";
+}
+const naoAchei=(sec,o,id)=>voltar(sec,SEC[sec].t)+cab("alerta","Registro não encontrado")+fala("Sem registro",`Não há ${esc(o)} com a chave ${esc(id)} nos dados desta versão. Os identificadores ainda podem mudar enquanto a planilha é corrigida.`,3);
+
+/* ===== Camadas: 1ª = Início (pastilhas); 2ª = página da seção (pastilhas ou planilha, à escolha); 3ª em diante = só planilha ===== */
+const emPlanilha=()=>VISTA==="planilha";
+const alterna=()=>`<div class="alterna" role="group" aria-label="Forma de ver a lista">${[["pastilhas","grade4","Pastilhas"],["planilha","tabela","Planilha"]].map(x=>`<button type="button" class="alt" data-vista="${x[0]}" aria-pressed="${VISTA===x[0]}">${ico(x[1])}${x[2]}</button>`).join("")}</div>`;
+/* Planilha: a tabela da casca, com ordenação pelo título da coluna e a primeira coluna como botão que abre o registro.
+   Colunas: {k, t, n (número), nq (não quebra), dec, v (valor para ordenar), h (HTML da célula), x (HTML depois do botão)} */
+const COLA=new Intl.Collator("pt-BR",{numeric:true});
+function planilha(id,cs,linhas,o){
+  o=o||{};
+  if(!linhas.length)return vazio(o.vazio||"Nenhum registro nesta lista.");
+  const st=ORD[id]||(ORD[id]={k:o.ord?o.ord[0]:null,d:o.ord&&o.ord[1]<0?-1:1}), col=cs.find(x=>x.k===st.k), val=c=>c.v||(r=>r[c.k]);
+  let L=linhas;
+  if(col){const ch=new Map(linhas.map(r=>{const x=val(col)(r);return[r,x==null||x===""?null:(typeof x==="number"?x:sa(x))]}));   /* vazios ficam sempre no fim */
+    L=[...linhas].sort((a,b)=>{const x=ch.get(a),y=ch.get(b);if(x===null||y===null)return x===y?0:(x===null?1:-1);return(typeof x==="number"&&typeof y==="number"?x-y:COLA.compare(String(x),String(y)))*st.d})}
+  const passo=o.passo||200; let n=LIM["pl:"+id]||passo; if(L.length-n<=40)n=L.length;
+  const vis=L.slice(0,n), resto=L.length-vis.length, dica=!DICA_PL++;
+  const cel=(c,r)=>{if(c.h)return c.h(r);const v=val(c)(r);return v==null||v===""?"":(typeof v==="number"?fmt(v,c.dec||0):esc(v))};
+  const th=c=>{const on=st.k===c.k;
+    return`<th class="${c.n?"n":""}" aria-sort="${on?(st.d>0?"ascending":"descending"):"none"}"><button type="button" class="ord" data-ord="${esc(id)}|${esc(c.k)}" title="Ordenar por ${esc(c.t.toLowerCase())}">${esc(c.t)}${ico(on?(st.d>0?"asc":"desc"):"ordena")}</button></th>`};
+  const tr=r=>{const ir=o.ir&&o.ir(r);
+    return`<tr${ir?` class="clic" data-ir="${esc(ir)}"`:""}>${cs.map((c,i)=>{const h=cel(c,r);
+      return`<td class="${[c.n?"n":(c.nq?"nq":"tx"),i?"":"a"].filter(Boolean).join(" ")}">${i===0&&ir?`<button type="button" class="abre" data-ir="${esc(ir)}">${h}</button>`:h}${c.x?c.x(r):""}</td>`}).join("")}</tr>`};
+  const instr=(L.length>1?"clique no título de uma coluna para ordenar":"")+(o.ir?(L.length>1?" e numa linha para abrir":"clique na linha para abrir"):"");
+  const info=o.conta===false?(instr?instr.charAt(0).toUpperCase()+instr.slice(1)+".":""):plural(L.length,"linha","linhas")+(instr?" · "+instr:"");
+  return `<div class="pl">${dica&&info?`<p class="pl-info">${info}</p>`:""}
+    <div class="tabwrap plan"><table class="q"><thead><tr>${cs.map(th).join("")}</tr></thead><tbody>${vis.map(tr).join("")}</tbody></table></div>`+
+    (resto>0?`<button class="mais" type="button" data-mais="pl:${esc(id)}" data-n="${n+passo}">${ico("baixo")}Mostrar mais ${fmt(Math.min(passo,resto))} de ${fmt(resto)}</button>`:"")+`</div>`;
+}
+/* Planilha larga demais para a página ganha rolagem própria; as outras ficam com o cabeçalho preso à página */
+function ajustaPlanilhas(){
+  $$(".tabwrap.plan").forEach(w=>{w.classList.remove("rola");const t=w.firstElementChild;if(t&&t.offsetWidth>w.clientWidth+1)w.classList.add("rola")});
+}
+const cols=(K,...ks)=>ks.map(k=>K[k]), todas=K=>Object.values(K);
+const PAV_ORD={"Térreo":0,"1º Andar":1,"2º Andar":2};
+const conf=(t,id)=>pendN(t,id)?' <span class="pill p-vi">A conferir</span>':"";
+const sigSet=id=>{const s=setor(id);return s?`<span title="${esc(s.nome)}">${esc(rot(s))}</span>`:""};
+const salasDe=p=>(IX.ocP.get(p.id)||[]).map(amb).filter(Boolean).map(a=>local(a)||a.id);
+const K_AMB={
+  local:{k:"local",t:"Local",nq:1,v:a=>local(a)||a.id},
+  nome:{k:"nome",t:"Nome",v:a=>a.nome||"",h:a=>esc(a.nome||"(sem nome)")+conf("Ambiente",a.id)},
+  tipo:{k:"tipo",t:"Tipo de espaço",v:a=>a.tipo||"",h:a=>a.tipo?esc(a.tipo):'<span class="adef">sem tipo</span>'},
+  setor:{k:"setor",t:"Setor",v:a=>rot(setor(a.setor)),h:a=>sigSet(a.setor)||'<span class="adef">sem setor</span>'},
+  pav:{k:"pav",t:"Pavimento",nq:1,v:a=>PAV_ORD[a.pav]??9,h:a=>esc(a.pav||"")},
+  cap:{k:"cap",t:"Lugares",n:1,v:a=>a.cap},
+  area:{k:"area",t:"Área (m²)",n:1,dec:1,v:a=>a.area},
+  sit:{k:"sit",t:"Situação",nq:1,v:a=>a.sit||"",h:a=>tag(a.sit,SIT_COR[a.sit])}
+};
+const plAmb=(id,lista,ks,o)=>planilha(id,cols(K_AMB,...ks),lista,Object.assign({ir:a=>"amb-"+a.id},o));
+const doBloco=b=>IX.ambBlo.get(b.sigla)||[];
+const K_BLO={
+  sigla:{k:"sigla",t:"Bloco",nq:1,v:b=>b.sigla},
+  nome:{k:"nome",t:"Nome",v:b=>b.nome||""},
+  na:{k:"na",t:"Ambientes",n:1,v:b=>doBloco(b).length},
+  area:{k:"area",t:"Área (m²)",n:1,v:b=>Math.round(soma(doBloco(b),a=>a.area))},
+  cap:{k:"cap",t:"Lugares",n:1,v:b=>soma(doBloco(b),a=>a.cap)},
+  pav:{k:"pav",t:"Pavimentos",n:1,v:b=>new Set(doBloco(b).map(a=>a.pav).filter(Boolean)).size},
+  set:{k:"set",t:"Setores",n:1,v:b=>new Set(doBloco(b).map(a=>a.setor).filter(Boolean)).size},
+  mapa:{k:"mapa",t:"No mapa",nq:1,v:b=>b.lat!=null?"Sim":"Não",h:b=>b.lat!=null?"Sim":'<span class="pill p-cz">Sem coordenada</span>'}
+};
+const doTipo=t=>IX.ambTipo.get(t)||[];
+const K_TIPO={
+  tipo:{k:"tipo",t:"Tipo de espaço",v:t=>t||"Sem tipo",h:t=>esc(t||"Sem tipo")+(t?"":' <span class="pill p-vi">A conferir</span>')},
+  mec:{k:"mec",t:"No censo do MEC",v:t=>(IX.tipo.get(t)||{}).mec||""},
+  na:{k:"na",t:"Ambientes",n:1,v:t=>doTipo(t).length},
+  area:{k:"area",t:"Área (m²)",n:1,v:t=>Math.round(soma(doTipo(t),a=>a.area))},
+  cap:{k:"cap",t:"Lugares",n:1,v:t=>soma(doTipo(t),a=>a.cap)},
+  nb:{k:"nb",t:"Blocos",n:1,v:t=>new Set(doTipo(t).map(a=>a.bloco)).size},
+  onde:{k:"onde",t:"Onde há mais",nq:1,v:t=>{const m=maiores(conta(doTipo(t),a=>a.bloco),1)[0];return m?`${m[0]} (${m[1]})`:""}}
+};
+const K_SET={
+  rot:{k:"rot",t:"Setor",v:s=>rot(s),x:s=>s.sigla?`<span class="nota">${esc(s.nome)}</span>`:""},
+  tipo:{k:"tipo",t:"Tipo",v:s=>s.tipo||""},
+  sup:{k:"sup",t:"Ligado a",v:s=>rot(setor(s.sup)),h:s=>sigSet(s.sup)},
+  resp:{k:"resp",t:"Responsável",v:s=>s.resp&&pes(s.resp)?nm(pes(s.resp).nome):"",h:s=>s.resp&&pes(s.resp)?esc(nomePes(pes(s.resp))):""},
+  na:{k:"na",t:"Ambientes",n:1,v:s=>(IX.ambSet.get(s.id)||[]).length},
+  area:{k:"area",t:"Área (m²)",n:1,v:s=>Math.round(soma(IX.ambSet.get(s.id)||[],a=>a.area))},
+  np:{k:"np",t:"Pessoas",n:1,v:s=>(IX.pesSet.get(s.id)||[]).length},
+  nd:{k:"nd",t:"Demandas abertas",n:1,v:s=>(IX.demSet.get(s.id)||[]).filter(d=>d.sit==="Aberta").length}
+};
+const K_PES={
+  nome:{k:"nome",t:"Nome",v:p=>nm(p.nome),h:p=>esc(nomePes(p))+(p.situ&&p.situ!=="Lotado"?' <span class="pill p-vi">Desligado</span>':"")},
+  cat:{k:"cat",t:"Categoria",nq:1,v:p=>p.cat||""},
+  cargo:{k:"cargo",t:"Cargo",v:p=>p.cargo||""},
+  lot:{k:"lot",t:"Lotação",v:p=>rot(setor(p.lot)),h:p=>sigSet(p.lot)},
+  sala:{k:"sala",t:"Sala",v:p=>salasDe(p).join("; "),h:p=>{const l=salasDe(p);return l.length?esc(l.join("; ")):'<span class="pill p-cz">Sem sala</span>'}}
+};
+const turmasDe=d=>T?(IX.tDis.get(d.cod+"|"+d.niv)||[]):null;
+const kDis=()=>({
+  cod:{k:"cod",t:"Código",nq:1,v:d=>d.cod},
+  nome:{k:"nome",t:"Disciplina",v:d=>nm(d.nome),h:d=>esc(nm(d.nome))+(d.adeq?"":' <span class="pill p-vi">Sala a definir</span>')},
+  niv:{k:"niv",t:"Nível",nq:1,v:d=>NIVEL[d.niv]||""},
+  uni:{k:"uni",t:"Unidade",v:d=>{const s=IX.sigla.get(d.uni);return s?rot(setor(s)):nomeUni(d.uni)}},
+  ts:{k:"ts",t:"Turmas em "+SEM,n:1,v:d=>{const l=turmasDe(d);return l?l.filter(i=>T[i][TC.sem]===SEM).length:null}},
+  tt:{k:"tt",t:"Turmas no período",n:1,v:d=>{const l=turmasDe(d);return l?l.length:null}},
+  adeq:{k:"adeq",t:"Sala adequada",v:d=>d.adeq||""},
+  usado:{k:"usado",t:"Sala mais usada",v:d=>d.usado||""}
+});
+const prioN=p=>{const i=D.listas.prioridades.indexOf(p);return i<0?99:i};
+const K_DEM={
+  id:{k:"id",t:"ID",nq:1,v:d=>d.id},
+  titulo:{k:"titulo",t:"Demanda",v:d=>d.titulo||""},
+  setor:{k:"setor",t:"Setor",v:d=>rot(setor(d.setor)),h:d=>sigSet(d.setor)||'<span class="adef">sem setor do SIPAC</span>'},
+  tipo:{k:"tipo",t:"Tipo de espaço",v:d=>d.tipo||"",h:d=>esc(d.tipo||"")+(d.tipo&&!IX.tipo.has(d.tipo)?' <span class="pill p-vi">fora da lista</span>':"")},
+  nat:{k:"nat",t:"Natureza",v:d=>d.nat||""},
+  prio:{k:"prio",t:"Prioridade",nq:1,v:d=>prioN(d.prio),h:d=>{const p=String(d.prio||"").split(" · ");return d.prio?tag(p[0],p[0][0]==="P"?"p-tc":"p-vi")+" "+esc(p[1]||""):""}},
+  area:{k:"area",t:"Área (m²)",n:1,v:d=>d.area==null||d.area===""?null:+d.area},
+  sit:{k:"sit",t:"Situação",nq:1,v:d=>d.sit||"",h:d=>tag(d.sit,DEM_COR[d.sit])}
+};
+const oQueFazer=k=>{const ds=new Set(k.itens.map(x=>x.d||""));return ds.size===1?[...ds][0]:"Cada registro tem a sua anotação."};
+const K_PEND={
+  p:{k:"p",t:"Pendência",v:k=>k.p},
+  t:{k:"t",t:"Tabela",nq:1,v:k=>k.t},
+  n:{k:"n",t:"Registros",n:1,v:k=>k.itens.length},
+  d:{k:"d",t:"O que fazer",v:oQueFazer}
+};
+const horaEv=x=>x.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}).replace(":00","h").replace(":","h");
+const diaEv=x=>x.toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"}).replace(/\.| de /g," ").replace(/\s+/g," ");
+const K_EV={
+  titulo:{k:"titulo",t:"Evento",v:e=>e.titulo||"",h:e=>esc(e.titulo||"")+(e.exemplo?' <span class="pill p-cz">Exemplo</span>':"")},
+  quando:{k:"quando",t:"Quando",nq:1,v:e=>e.inicio||"",h:e=>{const a=new Date(e.inicio),b=new Date(e.fim);return isNaN(a)?"":esc(diaEv(a)+", das "+horaEv(a)+(isNaN(b)?"":" às "+horaEv(b)))}},
+  onde:{k:"onde",t:"Onde",v:e=>{const a=amb(e.amb);return a?local(a)+(a.nome?" · "+a.nome:""):""}},
+  prom:{k:"prom",t:"Promove",v:e=>rot(setor(e.promotor)),h:e=>sigSet(e.promotor)},
+  pub:{k:"pub",t:"Público",nq:1,v:e=>e.publico==="Sim"?"Aberto ao público":"Interno"}
+};
+
+/* ===== Início ===== */
+function vInicio(){
+  const n={blocos:plural(D.blocos.length,"bloco","blocos"),ambientes:plural(D.ambientes.length,"ambiente","ambientes"),setores:plural(D.setores.length,"setor","setores"),pessoas:plural(D.pessoas.length,"pessoa","pessoas"),
+    aulas:T?plural(T.length,"turma","turmas"):plural(D.disciplinas.length,"disciplina","disciplinas"),demandas:plural(D.demandas.filter(d=>d.sit==="Aberta").length,"aberta","abertas"),eventos:"A criar",corrigir:plural(D.pendencias.length,"pendência","pendências")};
+  return cab("casa","Dimensões dos Espaços")+
+    `<div class="hero">${coruja(0)}<div class="fala"><small>Portal Espaços do CT · protótipo</small>
+      <div class="bub">Este protótipo mostra como a comunidade navegaria pelos espaços do CT: ${fmt(D.ambientes.length)} ambientes em ${fmt(D.blocos.length)} blocos, quem ocupa cada sala, que aulas acontecem nela e o que cada setor pediu. Os dados vêm das planilhas da Direção e ainda têm cadastros a corrigir, marcados com a etiqueta <span class="selo vi">A conferir</span>. Em <button type="button" class="lk-fala" data-ir="sobre">Sobre o protótipo</button>, você vê de onde vem cada dado.</div></div></div>`+
+    grade(SECOES.map(s=>card({ir:s.id,cor:s.n,ic:s.ic,marca:s.t,tags:[n[s.id]],t:s.t,d:s.resumo,pe:"Abrir a seção",seta:"seta",sem:s.id==="eventos"})).join(""));
+}
+
+/* ===== Blocos ===== */
+/* Mapa do CT (v4): cada bloco como um sólido, com o norte para cima e na escala real (mapa.json, gerado por mapa/gera_solidos.py) */
+let PLANTAS=null, PAV_PL="T";
+const CAT_TIPO={"Sala de Aula":"aula","Sala Multimídia":"aula","Auditório":"aula","Laboratório de Informática":"aula","Laboratório":"lab","Ambiente de Técnicos de Laboratório":"lab","Sala de Projeto":"lab",
+  "Ambiente de Professor":"prof","Administração":"adm","Coordenação":"adm","Reprografia":"adm","Sala de Estudos":"est","Centro Acadêmico":"est","Empresa Junior":"est","Biblioteca":"est","Área de Lazer":"est",
+  "Restaurante":"est","Clínica":"est","Banheiro":"apo","Copa":"apo","Almoxarifado":"apo"};
+const CATS=[["aula","Ensino: sala de aula, multimídia, auditório, informática"],["lab","Laboratório e sala de projeto"],["prof","Ambiente de professor"],["adm","Administração e coordenação"],
+  ["est","Estudos, centro acadêmico, biblioteca"],["apo","Apoio: banheiro, copa, almoxarifado"],["sem","Sala da planta sem ambiente correspondente no inventário"],["out","Sala de outro bloco do mesmo prédio"]];
+const PAVS_PL=[["T","Térreo"],["1","1º Andar"],["2","2º Andar"]];
+function catSala(s,sg,dono){
+  const a=s.amb?IX.amb.get(s.amb):null;
+  if(a)return a.bloco===sg?(CAT_TIPO[a.tipo]||"apo"):"out";
+  return s.b===dono&&sg===dono?"sem":"out";
+}
+/* Planta de um pavimento do bloco: paredes e salas da planta (plantas.json, mapa/gera_plantas.py); clicar numa sala ligada abre o ambiente */
+function plantaBloco(b,o){
+  o=o||{}; if(!PLANTAS)return""; const pb=PLANTAS.blocos[b.sigla]; if(!pb)return"";
+  const inv=new Set((IX.ambBlo.get(b.sigla)||[]).map(a=>a.pav).filter(Boolean));
+  const abas=PAVS_PL.filter(([k,n])=>pb[k]||inv.has(n));
+  let pav=o.pav||PAV_PL; if(!pb[pav])pav=(abas.find(([k])=>pb[k])||["T"])[0];
+  const f=pb[pav]; if(!f)return"";
+  const fs=PLANTAS.fs||8, [vx,vy,vw,vh]=f.vb.map(v=>v*10), terreo=PLANTAS.predios[f.p];
+  const ands=pav==="T"?[]:Object.values(PLANTAS.andares||{}).filter(x=>x.p===f.p&&x.pav===pav);
+  const P=pav==="T"?terreo:{paredes:ands.map(x=>x.paredes).join(""),contorno:ands.map(x=>x.contorno).join("")};
+  const salas=PLANTAS.salas.map((s,i)=>Object.assign({i},s)).filter(s=>s.p===f.p&&s.pav===pav);
+  const cont={}; let lig=0;
+  const g=salas.map(s=>{
+    const c=catSala(s,b.sigla,f.dono), a=s.amb?IX.amb.get(s.amb):null, alvo=o.destaque&&s.amb===o.destaque;
+    if(c!=="out"){cont[c]=(cont[c]||0)+1; if(a)lig++}
+    const tit=a?`${a.id} · ${a.nome}`:`${s.cod||"Sem código"} · ${s.nome||"sem nome"} (sem correspondência no inventário)`;
+    const forma=s.d?`<path d="${s.d}"/>`:`<circle cx="${(s.x*10).toFixed(0)}" cy="${(s.y*10).toFixed(0)}" r="12"/>`;
+    return `<g class="sala c-${c}${a?"":" nl"}${alvo?" alvo":""}" data-sala="${s.i}"${a?` data-ir="amb-${esc(a.id)}"`:""} tabindex="0" role="${a?"link":"img"}" aria-label="${esc(tit)}"><title>${esc(tit)}</title>${forma}</g>`;
+  }).join("");
+  const cods=salas.filter(s=>s.lx!=null&&s.c&&catSala(s,b.sigla,f.dono)!=="out").map(s=>`<text class="cod${o.destaque&&s.amb===o.destaque?" claro":""}" data-s="${s.i}" x="${s.lx}" y="${s.ly}" font-size="${fs}" dominant-baseline="central">${esc(s.c)}</text>`).join("");
+  const rosa=`<g class="rosa"></g>`;                 /* norte e escala: desenhados por ajustaPlanta() no tamanho da tela */
+  const svg=`<svg class="planta-svg" data-sgpl="${esc(b.sigla)}" viewBox="${vx} ${vy} ${vw} ${vh}" role="img" aria-label="Planta do ${esc(PAVS_PL.find(p=>p[0]===pav)[1])} do bloco ${esc(b.sigla)}, com o norte para cima">`+
+    `<path class="contorno" d="${P.contorno}" fill-rule="evenodd"/>${pav!=="T"?`<path class="proj" d="${terreo.contorno}" fill-rule="evenodd"/>`:""}${g}<path class="par" d="${P.paredes}" fill-rule="evenodd"/>${f.div?`<path class="solbl" d="${f.sol}"/>`:""}${cods}${rosa}</svg>`;
+  if(o.compacta)return`<div class="mapawrap pl">${svg}</div>`;
+  const nAmbPav=(IX.ambBlo.get(b.sigla)||[]).filter(a=>a.pav===PAVS_PL.find(p=>p[0]===pav)[1]).length;
+  const botoes=`<div class="abas-pav" role="group" aria-label="Pavimento da planta">${abas.map(([k,n])=>pb[k]?`<button type="button" data-pavpl="${k}" aria-pressed="${k===pav}">${n}</button>`:`<button type="button" disabled title="Este pavimento não está desenhado na planta em PDF">${n} · sem planta</button>`).join("")}</div>`;
+  const ini=`<span class="rot">Planta · ${esc(PAVS_PL.find(p=>p[0]===pav)[1])}</span><b>${plural(salas.filter(s=>catSala(s,b.sigla,f.dono)!=="out").length,"sala desenhada","salas desenhadas")}</b><p>${plural(lig,"sala ligada","salas ligadas")} a ${nAmbPav} ${nAmbPav===1?"ambiente":"ambientes"} do inventário neste pavimento. Passe o cursor sobre uma sala para ver os dados; clique para abrir o ambiente.</p>`;
+  const leg=CATS.filter(([k])=>cont[k]||k==="out"&&salas.some(s=>catSala(s,b.sigla,f.dono)==="out")).map(([k,t])=>`<li><i class="c-${k}"></i><span>${esc(t)}</span>${cont[k]?`<b>${fmt(cont[k])}</b>`:""}</li>`).join("");
+  return quadro("Planta do bloco",botoes+`<div class="planta-bl"><div class="mapawrap pl">${svg}</div><div class="mapa-lado"><div class="mapa-info sala-info" aria-live="polite" data-ini="${esc(ini)}">${ini}</div>`+
+    `<ul class="leg-planta">${leg}</ul><p class="dica">Desenho tirado da ${esc(PLANTAS.fonte)}, com o norte para cima.${pav!=="T"?" A planta deste andar está na coluna da direita da folha e foi encaixada sobre o térreo pelas paredes; a linha cinza tracejada é o contorno do térreo.":""}${f.div?" A linha tracejada vermelha marca a parte do prédio que é deste bloco no térreo.":""} Sala desenhada como ponto: a planta não fecha o contorno dela. A ligação com o inventário foi feita pela área e pelo nome e ainda precisa ser conferida.</p></div></div>`);
+}
+/* Na página do ambiente: a planta do pavimento com a sala em destaque (quando a sala da planta está ligada ao ambiente) */
+function ondeFica(a,b){
+  if(!PLANTAS||!b)return"";
+  const s=PLANTAS.salas.find(x=>x.amb===a.id); if(!s)return"";
+  const n=PAVS_PL.find(p=>p[0]===s.pav)[1];
+  return quadro("Onde fica",plantaBloco(b,{destaque:a.id,pav:s.pav,compacta:true})+
+    `<p class="dica">Em destaque, a sala na planta do ${esc(n==="Térreo"?"térreo":n.toLowerCase())} do bloco ${esc(b.sigla)}${s.cod?" (código "+esc(s.cod)+" na planta)":""}, com o norte para cima. ${s.conf==="média"?"A ligação entre a sala da planta e este ambiente é provável e ainda precisa ser conferida. ":""}Clique em outra sala para abrir o ambiente dela.</p>`);
+}
+/* Códigos das salas: letra de cerca de 11 px na tela; o código só aparece se couber inteiro dentro da sala */
+function ajustaPlanta(){
+  document.querySelectorAll("#tela .planta-svg").forEach(svg=>{
+    const r=svg.getBoundingClientRect(), vb=svg.viewBox.baseVal; if(!r.width||!vb||!vb.width)return;
+    const k=Math.min(r.width/vb.width,r.height/vb.height), fs=Math.max(5,11/k);
+    const ro=svg.querySelector("g.rosa");
+    if(ro){const u=1/k, ox=vb.x+vb.width/2+(r.width/k)/2, oy=vb.y+vb.height/2-(r.height/k)/2, bx=vb.x+vb.width/2-(r.width/k)/2, by=vb.y+vb.height/2+(r.height/k)/2;
+      const m=[2,5,10,20,25,50,100].filter(v=>v*10*k<=130).pop()||2;
+      ro.innerHTML=`<path d="M${ox-26*u} ${oy+12*u}l${-7*u} ${18*u}h${14*u}z"/><text x="${ox-26*u}" y="${oy+46*u}" font-size="${14*u}" text-anchor="middle">N</text>`+
+        `<path d="M${bx+16*u} ${by-16*u}h${m*10}" stroke="var(--petroleo)" stroke-width="${3*u}"/><path d="M${bx+16*u} ${by-21*u}v${10*u}M${bx+16*u+m*10} ${by-21*u}v${10*u}" stroke="var(--petroleo)" stroke-width="${1.5*u}"/>`+
+        `<text x="${bx+16*u}" y="${by-26*u}" font-size="${13*u}">${m} m</text>`}
+    svg.querySelectorAll("text.cod").forEach(t=>{
+      t.setAttribute("font-size",fs.toFixed(1)); t.style.display="";
+      const p=svg.querySelector(`.sala[data-sala="${t.dataset.s}"] path`); if(!p){t.style.display="none";return}
+      const b=t.getBBox(), m=fs*0.12, cs=[[b.x+m,b.y+m],[b.x+b.width-m,b.y+m],[b.x+m,b.y+b.height-m],[b.x+b.width-m,b.y+b.height-m]];
+      if(!cs.every(([x,y])=>p.isPointInFill(new DOMPoint(x,y))))t.style.display="none";
+    });
+  });
+}
+let tPlanta=null; window.addEventListener("resize",()=>{clearTimeout(tPlanta);tPlanta=setTimeout(ajustaPlanta,150)});
+function infoSala(i,sg){
+  const s=PLANTAS.salas[i], a=s.amb?IX.amb.get(s.amb):null, st=a&&a.setor?setor(a.setor):null;
+  if(!a)return`<span class="rot">Sala da planta</span><b>${esc(s.cod||"Sem código")}</b><p>${esc(s.nome||"Sem nome na planta")}${s.area?" · "+m2(s.area)+" na planta":""}. Sem ambiente correspondente no inventário: a conferir.</p>`;
+  return`<span class="rot">${esc(a.tipo||"Ambiente")}${s.cod?" · "+esc(s.cod)+" na planta":""}</span><b>${esc(a.nome)}</b><p>${esc(a.id)}${a.bloco!==sg?" · bloco "+esc(a.bloco):""} · ${m2(a.area)} no inventário${s.area?" ("+m2(s.area)+" na planta)":""}${st?" · "+esc(st.nome||st.sigla||""):""}.${s.conf==="média"?" Ligação provável, a conferir.":""} Clique para abrir o ambiente.</p>`;
+}
+function infoBloco(sg,M){
+  const b=IX.blo?IX.blo.get(sg):D.blocos.find(x=>x.sigla===sg), as=IX.ambBlo.get(sg)||[], s=M.solidos.find(x=>x.b===sg), ap=M.aprox.find(x=>x.b===sg);
+  const nome=b&&b.nome&&b.nome!==sg&&b.nome!==sg.replace(/^CTP? /,"")?b.nome:"";
+  return `<span class="rot">Bloco</span><b>${esc(sg)}</b><p>${nome?esc(nome)+". ":""}${plural(as.length,"ambiente","ambientes")} e ${m2(soma(as,a=>a.area))} no inventário.`+
+    (s?` Na planta do térreo, o ${s.tambem.length?"prédio":"bloco"} ocupa cerca de ${m2(s.area)}${s.tambem.length?"; também abriga "+juntar(s.tambem.map(esc)):""}.`:"")+
+    (ap?` Posição aproximada: ${esc(ap.nota.charAt(0).toLowerCase()+ap.nota.slice(1))}.`:"")+` Clique para abrir.</p>`;
+}
+function mapaSolidos(){
+  const M=MAPA, fs=M.fs||4.4, temSol=new Set([...M.solidos.map(s=>s.b),...M.aprox.map(a=>a.b)]);
+  const sem=D.blocos.filter(b=>!temSol.has(b.sigla)), nAm=sg=>(IX.ambBlo.get(sg)||[]).length;
+  const tit=sg=>{const b=D.blocos.find(x=>x.sigla===sg);return esc(sg)+(b&&b.nome&&b.nome!==sg?" · "+esc(b.nome):"")+" · "+plural(nAm(sg),"ambiente","ambientes")};
+  const sol=M.solidos.map(s=>`<g class="sol" data-ir="blo-${esc(sl(s.b))}" data-sg="${esc(s.b)}" tabindex="0" role="link" aria-label="${tit(s.b)}"><title>${tit(s.b)}</title><path d="${s.d}" fill-rule="evenodd"/>`+
+      `<text class="${s.dentro||"f"}" x="${s.lx}" y="${s.ly}" font-size="${fs}" text-anchor="middle">${esc(s.t)}</text></g>`).join("");
+  const ap=M.aprox.map(a=>`<g class="sol ap" data-ir="blo-${esc(sl(a.b))}" data-sg="${esc(a.b)}" tabindex="0" role="link" aria-label="${tit(a.b)} (posição aproximada)"><title>${tit(a.b)}\n${esc(a.nota)}</title>`+
+      `<circle cx="${a.x}" cy="${a.y}" r="${a.r}"/>${a.caixa?`<rect x="${a.caixa[0]}" y="${a.caixa[1]}" width="${a.caixa[2]}" height="${a.caixa[3]}" rx="1.1"/>`:""}<text x="${a.lx}" y="${a.ly}" font-size="${(fs*.86).toFixed(2)}" text-anchor="${a.anc}">${esc(a.t)}</text></g>`).join("");
+  const W=M.w, H=M.h, nx=W-10, ny=14;
+  const rosa=`<g class="rosa" font-size="${fs}"><path d="M${nx} ${ny-9}l-3.2 8.5h6.4z" fill="var(--petroleo)"/><text x="${nx}" y="${ny+4.6}" text-anchor="middle">N</text>`+
+    `<path d="M8 ${H-8}h50" stroke="var(--petroleo)" stroke-width="1.2"/><path d="M8 ${H-10.5}v5M58 ${H-10.5}v5M33 ${H-9.5}v3" stroke="var(--petroleo)" stroke-width=".8"/><text x="8" y="${H-12}">50 m</text></g>`;
+  const ini=`<span class="rot">Mapa do CT</span><b>${plural(M.solidos.length,"bloco desenhado","blocos desenhados")}</b><p>Passe o cursor sobre um bloco para ver o resumo; clique (ou toque) para abrir a página do bloco.${M.aprox.length?` ${plural(M.aprox.length,"bloco ocupa","blocos ocupam")} parte de outro prédio ou um andar e ${M.aprox.length===1?"aparece":"aparecem"} como círculo.`:""}</p>`;
+  return quadro("Mapa do CT",`<p class="mapa-cel">Arraste o mapa para o lado para ver os blocos do leste.</p><div class="mapa-sol"><div class="mapawrap"><svg class="mapa-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa do CT com o norte para cima: cada bloco é um sólido clicável">${sol}${ap}${rosa}</svg></div>`+
+    `<div class="mapa-lado"><div class="mapa-info" aria-live="polite" data-ini="${esc(ini)}">${ini}</div>`+
+    `<ul class="mapa-leg"><li><i></i><span>Bloco: o contorno do prédio tirado das paredes da planta do térreo. Prédios com mais de um bloco aparecem divididos por uma linha branca, pelas salas de cada bloco.</span></li>`+
+    (M.aprox.length?`<li><i class="ap"></i><span>Bloco que ocupa parte de outro prédio ou um andar de outro bloco (posição aproximada).</span></li>`:"")+`</ul>`+
+    `<p class="dica">Desenho com o norte para cima, na escala real (${esc(M.fonte)}).${sem.length?` Fora do mapa: ${sem.map(b=>esc(b.sigla)+(M.sem_posicao&&M.sem_posicao[b.sigla]?" ("+esc(M.sem_posicao[b.sigla].charAt(0).toLowerCase()+M.sem_posicao[b.sigla].slice(1))+")":"")).join("; ")}.`:""}</p></div></div>`);
+}
+function mapaBlocos(){
+  if(MAPA&&MAPA.solidos)return mapaSolidos();
+  const com=D.blocos.filter(b=>b.lat!=null); if(com.length<2)return"";
+  const la=com.map(b=>b.lat), lo=com.map(b=>b.lon), k=Math.cos(-7.143*Math.PI/180), GR=111320, x0=Math.min(...lo), x1=Math.max(...lo), y0=Math.min(...la), y1=Math.max(...la);
+  const px=2.3, mx=56, my=48, W=Math.round((x1-x0)*k*GR*px+mx+170), H=Math.round((y1-y0)*GR*px+2*my);
+  const pts=com.map(b=>({b,x:mx+(b.lon-x0)*k*GR*px,y:my+(y1-b.lat)*GR*px,n:(IX.ambBlo.get(b.sigla)||[]).length}));
+  return quadro("Mapa esquemático do CT",`<div class="mapawrap"><svg class="mapa-svg" viewBox="0 0 ${W} ${H}" style="max-width:${W}px" role="img" aria-label="Mapa esquemático com os blocos do CT que têm coordenada">`+
+    `<g font-family="'Source Sans 3',Arial,sans-serif" font-size="13" fill="#5b6573"><text x="${W-16}" y="26" text-anchor="end" font-weight="600">N ↑</text><path d="M20 ${H-18}h${Math.round(50*px)}" stroke="#5b6573" stroke-width="2"/><text x="20" y="${H-25}">50 m</text></g>`+
+    pts.map(p=>{const r=6+Math.sqrt(p.n);return`<g class="pino" data-ir="blo-${esc(sl(p.b.sigla))}" tabindex="0" role="link" aria-label="${esc(p.b.sigla)}: ${p.n} ambientes"><title>${esc(p.b.nome)} · ${p.n} ambientes</title><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r.toFixed(1)}"/><text x="${(p.x+r+5).toFixed(1)}" y="${(p.y+4).toFixed(1)}">${esc(p.b.sigla)}</text></g>`}).join("")+
+    `</svg></div><p class="dica">${com.length} dos ${D.blocos.length} blocos têm coordenada; o círculo cresce com o número de ambientes. Clique num bloco para abrir. No sistema, este desenho dá lugar à planta do CT, com cada sala clicável.</p>`);
+}
+function vBlocos(){
+  const sem=D.blocos.filter(b=>b.lat==null).length, porArea=[...D.blocos].map(b=>[b.sigla,soma(IX.ambBlo.get(b.sigla)||[],a=>a.area)]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  return cab("predio","Blocos",alterna())+
+    fala("Blocos",`O CT tem ${plural(D.blocos.length,"bloco","blocos")} no inventário. Os maiores em área são ${juntar(porArea.map(x=>`${esc(x[0])} (${fmt(x[1],0)} m²)`))}. Abra um bloco para ver a planilha das salas, com filtro por pavimento; ${sem} blocos ainda não têm coordenada e ficam fora do mapa.`)+
+    mapaBlocos()+
+    (emPlanilha()?planilha("blocos",todas(K_BLO),D.blocos,{ord:["sigla",1],ir:b=>"blo-"+sl(b.sigla)}):grade(D.blocos.map(cBloco).join("")));
+}
+function pBloco(id){
+  const b=IX.bloSl.get(id); if(!b)return naoAchei("blocos","bloco",id);
+  const as=[...(IX.ambBlo.get(b.sigla)||[])].sort(ordCod), ts=maiores(conta(as.filter(a=>a.tipo),a=>a.tipo),3), ss=new Set(as.map(a=>a.setor).filter(Boolean)), aula=as.filter(a=>a.sg).length;
+  const pv=a=>a.pav||"Sem pavimento", pavs=[...new Set(as.map(pv))].sort((x,y)=>(PAV_ORD[x]??9)-(PAV_ORD[y]??9)), nPav=pavs.filter(p=>p!=="Sem pavimento").length;
+  if(FIL.pav!=="Todos"&&!pavs.includes(FIL.pav))FIL.pav="Todos";
+  const L=as.filter(a=>FIL.pav==="Todos"||pv(a)===FIL.pav);
+  const txt=`${b.nome&&b.nome!==b.sigla?esc(b.nome)+" ("+esc(b.sigla)+")":"O bloco "+esc(b.sigla)} tem ${plural(as.length,"ambiente","ambientes")} e ${m2(soma(as,a=>a.area))} em ${plural(nPav,"pavimento","pavimentos")}. ${ts.length?"Os usos mais comuns são "+juntar(ts.map(x=>`${esc(x[0])} (${x[1]})`))+". ":""}${aula?(aula===1?"Uma sala está":fmt(aula)+" salas estão")+" no SIGAA como sala de aula. ":""}${b.lat==null?"O bloco ainda não tem coordenada e por isso não aparece no mapa.":""}`;
+  return voltar("blocos","Blocos")+cab("predio",b.sigla+(b.nome&&b.nome!==b.sigla?" · "+b.nome:""))+fala("Bloco "+b.sigla,txt)+
+    meta4([["Ambientes","grade4",fmt(as.length)],["Área","regua",m2(soma(as,a=>a.area))],["Lugares somados","cadeira",fmt(soma(as,a=>a.cap))],["Setores presentes","setores",fmt(ss.size)]])+
+    meta4([["Sigla na planta","tabela",b.planta?esc(b.planta):""],["Prefixo no SIGAA","cap",b.sigaa?esc(b.sigaa):""],["Nome no Cuida CT","chave",b.cuida?esc(b.cuida):""],["Coordenada","pino",b.lat!=null?fmt(b.lat,6)+"; "+fmt(b.lon,6):""]])+
+    plantaBloco(b)+
+    grupo("Salas do bloco",plural(as.length,"ambiente","ambientes"),
+      (pavs.length>1?chips("Pavimento",[["Todos","Todos ("+fmt(as.length)+")"],...pavs.map(p=>[p,p+" ("+fmt(as.filter(a=>pv(a)===p).length)+")"])],FIL.pav,"pav"):"")+
+      plAmb("blo:"+id,L,["local","nome","tipo","setor","pav","cap","area","sit"],{ord:["pav",1],conta:false}))+
+    alertas("Bloco",b.sigla);
+}
+
+/* ===== Ambientes ===== */
+function vAmbientes(){
+  const tipos=[...IX.ambTipo.keys()].sort((a,b)=>(IX.ambTipo.get(b).length-IX.ambTipo.get(a).length)||ordAlf(a,b)), t3=tipos.filter(Boolean).slice(0,3);
+  const nConf=D.ambientes.filter(a=>pendN("Ambiente",a.id)).length;
+  return cab("grade4","Ambientes",alterna())+
+    fala("Ambientes",`O inventário tem ${plural(D.ambientes.length,"ambiente","ambientes")} e ${m2(soma(D.ambientes,a=>a.area))}, em ${plural(tipos.filter(Boolean).length,"tipo","tipos")} de espaço. Os mais numerosos são ${juntar(t3.map(t=>`${esc(t)} (${IX.ambTipo.get(t).length})`))}. Escolha um tipo para ver a planilha das salas; ${fmt(nConf)} ambientes trazem a etiqueta A conferir, porque o cadastro tem alguma pendência.`)+
+    (emPlanilha()?planilha("tipos",todas(K_TIPO),tipos,{ord:["na",-1],ir:t=>"tipo-"+(t?sl(t):"sem-tipo")}):grade(tipos.map(cTipo).join("")));
+}
+function pTipo(id){
+  if(!IX.tipoSl.has(id))return naoAchei("ambientes","tipo de espaço",id);
+  const t=IX.tipoSl.get(id), as=[...(IX.ambTipo.get(t)||[])].sort((a,b)=>ordAlf(a.bloco,b.bloco)||ordCod(a,b)), tp=IX.tipo.get(t), bl=maiores(conta(as,a=>a.bloco),3), st=maiores(conta(as.filter(a=>a.setor),a=>a.setor),3);
+  const semCap=as.filter(a=>a.cap==null).length;
+  return voltar("ambientes","Ambientes")+cab(t?icTipo(t):"alerta",t||"Sem tipo de espaço")+
+    fala(t||"Sem tipo",t?`São ${plural(as.length,"ambiente","ambientes")} deste tipo, com ${m2(soma(as,a=>a.area))} somados. Eles se concentram em ${juntar(bl.map(x=>`${esc(x[0])} (${x[1]})`))}${st.length?" e pertencem principalmente a "+juntar(st.map(x=>`${esc(rot(setor(x[0])))} (${x[1]})`)):""}.${tp?" No censo do MEC, este tipo entra como “"+esc(tp.mec)+"”.":""}`
+      :`${plural(as.length,"ambiente está","ambientes estão")} sem tipo de espaço no inventário. Sem o tipo, a sala não entra nas contagens por uso nem no relatório do MEC. A correção é feita na planilha de inventário.`)+
+    meta4([["Ambientes","grade4",fmt(as.length)],["Área","regua",m2(soma(as,a=>a.area))],["Lugares somados","cadeira",fmt(soma(as,a=>a.cap))+(semCap?` <span class="dica">· ${fmt(semCap)} sem capacidade</span>`:"")],["Blocos","predio",fmt(new Set(as.map(a=>a.bloco)).size)]])+
+    plAmb("tipo:"+id,as,["local","nome","setor","pav","cap","area","sit"],{ord:["local",1]});
+}
+let semFicha=null;
+function tabelaTurmas(idx,cols){
+  const linhas=idx.map(i=>{const t=T[i], d=IX.dis.get(t[TC.cod]+"|"+t[TC.niv]);return{sem:t[TC.sem],cod:t[TC.cod],niv:t[TC.niv],dis:d?nm(d.nome):"",turma:t[TC.turma],hor:t[TC.hor],mat:t[TC.mat],vag:t[TC.vag],doc:nm(t[TC.doc]),local:t[TC.local],amb:IX.ambSg.get(t[TC.idsg])}})
+    .sort((a,b)=>b.sem.localeCompare(a.sem)||ordAlf(a.cod,b.cod)||ordAlf(a.turma,b.turma));
+  const C={sem:["Semestre",r=>esc(r.sem)],dis:["Disciplina",r=>`<button class="lig" type="button" data-ir="dis-${esc(r.cod)}-${esc(r.niv)}">${esc(r.cod)}</button> ${esc(r.dis)}`],turma:["Turma",r=>esc(r.turma)],hor:["Horário",r=>esc(r.hor)],
+    mat:["Matric. / vagas",r=>`${fmt(r.mat)} / ${fmt(r.vag)}`,1],doc:["Docentes",r=>esc(r.doc)],local:["Local",r=>r.amb?ligAmb(r.amb):(r.local?esc(r.local):'<span class="pill p-cz">sem local</span>')]};
+  return `<div class="tabwrap"><table class="q"><thead><tr>${cols.map(c=>`<th class="${C[c][2]?"n":""}">${C[c][0]}</th>`).join("")}</tr></thead><tbody>${linhas.map(r=>`<tr>${cols.map(c=>`<td class="${C[c][2]?"n":""}">${C[c][1](r)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+const botoesSem=(idx,atual)=>{const tem=new Set(idx.map(i=>T[i][TC.sem]));return chips("Semestre",SEMS.map(s=>[s,s,!tem.has(s)]),atual,"semf")};
+function aulasDaSala(a){
+  if(turmasErro)return'<p class="dica">Não consegui carregar as turmas.</p>';
+  if(!T)return'<p class="dica">Carregando as turmas…</p>';
+  const todas=IX.tAmb.get(a.id)||[];
+  if(!todas.length)return'<p class="dica">Nenhuma turma de 2022.1 a 2026.2 está alocada nesta sala no SIGAA.</p>';
+  const tem=new Set(todas.map(i=>T[i][TC.sem]));
+  if(!semFicha||!tem.has(semFicha))semFicha=[...SEMS].reverse().find(s=>tem.has(s));
+  const idx=todas.filter(i=>T[i][TC.sem]===semFicha), g={};
+  idx.filter(i=>ocupaSala(T[i])).forEach(i=>slots(T[i][TC.hor]).forEach(s=>{(g[s]||(g[s]=[])).push(i)}));
+  const oc=Object.keys(g).length, ocU=Object.keys(g).filter(s=>s[0]!=="7").length, cap=a.cap??(a.sg&&a.sg.cap), acima=idx.filter(i=>cap&&T[i][TC.mat]>cap).length;
+  const cel=(d,au)=>{const l=g[d+au]||[];if(!l.length)return"";const t=T[l[0]];return`<button class="oc${l.length>1?" dup":""}" type="button" data-ir="dis-${esc(t[TC.cod])}-${esc(t[TC.niv])}" title="${esc(l.map(i=>T[i][TC.cod]+" T"+T[i][TC.turma]+" · "+nm((IX.dis.get(T[i][TC.cod]+"|"+T[i][TC.niv])||{}).nome)+" · "+T[i][TC.mat]+" matriculados").join("\n"))}">${esc(t[TC.cod])}${l.length>1?" +"+(l.length-1):""}</button>`};
+  return botoesSem(todas,semFicha)+
+    meta4([["Turmas em "+semFicha,"cap",fmt(idx.length)],["Horários ocupados","relogio",`${oc} de 96 (${pct(oc,96)})`],["Só de segunda a sexta","agenda",`${ocU} de 80 (${pct(ocU,80)})`],["Turmas acima da capacidade","alerta",cap?fmt(acima):""]])+
+    `<div class="ghwrap"><table class="gh"><thead><tr><th class="h">Aula</th>${DIAS.map(d=>`<th>${DIA_ROT[d]}</th>`).join("")}</tr></thead><tbody>${AULAS.map((x,i)=>`<tr class="${x[0]==="M6"||x[0]==="T6"?"inter":""}${i===6||i===12?" turno":""}"><td class="h"><b>${x[0]}</b> ${x[1]}</td>${DIAS.map(d=>`<td>${cel(d,x[0])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`+
+    `<p class="dica">Cada célula é uma aula da grade oficial; M6 e T6 são os horários intermediários. Azul = uma turma; vinho = mais de uma turma no mesmo horário. Só contam turmas presenciais com matriculados.</p>`+
+    tabelaTurmas(idx,["dis","turma","hor","mat","doc"]);
+}
+function pAmb(id){
+  const a=amb(id); if(!a)return naoAchei("ambientes","ambiente",id);
+  const s=setor(a.setor), oc=(IX.ocA.get(id)||[]).map(pes).filter(Boolean), b=IX.blo.get(a.bloco), tp=IX.tipo.get(a.tipo), sg=a.sg, ds=IX.demAmb.get(id)||[];
+  const tur=T&&sg?(IX.tAmb.get(id)||[]).filter(i=>T[i][TC.sem]===SEM):[];
+  const txt=`${a.tipo?esc(a.tipo):"Ambiente sem tipo informado"}${s?" do "+esc(rot(s)):""}${a.pav?", no "+esc(a.pav==="Térreo"?"térreo":a.pav.toLowerCase()):""} do bloco ${esc(a.bloco)}${a.cap||a.area!=null?", com "+[a.cap?plural(a.cap,"lugar","lugares"):null,a.area!=null?m2(a.area):null].filter(Boolean).join(" e "):""}. ${oc.length?(oc.length===1?"É ocupado por "+esc(nomePes(oc[0]))+". ":"É ocupado por "+plural(oc.length,"pessoa","pessoas")+". "):""}${sg?(tur.length?"Em "+SEM+", recebe "+plural(tur.length,"turma","turmas")+" pelo SIGAA. ":"Está no SIGAA como sala de aula. "):""}${pendN("Ambiente",id)?"O cadastro tem "+plural(pendN("Ambiente",id),"pendência","pendências")+" a conferir.":""}`;
+  let h=voltar("blo-"+sl(a.bloco),"Bloco "+a.bloco)+
+    `<div class="ficha-top"><span class="tipo">Ambiente ${esc(a.id)}</span>${tag(a.sit,SIT_COR[a.sit])}${sg?tag("Sala de aula no SIGAA","p-am"):""}${pendN("Ambiente",id)?tag("A conferir","p-vi"):""}</div>`+
+    cab(icTipo(a.tipo),(local(a)?local(a)+" · ":"")+(a.nome||"(sem nome)"))+fala("Ambiente",txt)+
+    meta4([["Tipo de espaço",icTipo(a.tipo),a.tipo?`<button class="lig" type="button" data-ir="tipo-${esc(sl(a.tipo))}">${esc(a.tipo)}</button>`:""],["Setor","setores",s?ligSet(s.id):""],["Capacidade","cadeira",a.cap!=null?plural(a.cap,"lugar","lugares"):""],["Área","regua",a.area!=null?m2(a.area):""]])+
+    quadro("Cadastro",`<dl class="dl">${dd("Bloco",b?`<button class="lig" type="button" data-ir="blo-${esc(sl(b.sigla))}">${esc(b.sigla)}</button> · ${esc(b.nome)}`:esc(a.bloco||""))}${dd("Pavimento",esc(a.pav||""))}${dd("Código da sala",a.cod==null?"":esc(a.cod))}${dd("Setor",s&&s.sigla?esc(s.nome):"")}${dd("Cursos atendidos",s&&s.cursos?esc(s.cursos):"")}${dd("Tipo no censo do MEC",tp?esc(tp.mec):"")}${dd("Observações",a.obs?esc(a.obs):"",1)}</dl>`)+
+    ondeFica(a,b)+
+    `<div data-cor="4">${grupo("Quem ocupa",oc.length?plural(oc.length,"pessoa","pessoas"):"",oc.length?planilha("amb:"+id+":p",cols(K_PES,"nome","cat","cargo","lot"),oc,{ord:["nome",1],ir:p=>"pes-"+p.id,conta:false}):vazio("Nenhuma pessoa ligada a este ambiente na tabela de ocupação."))}</div>`;
+  if(sg){
+    const dif=a.cap!=null&&sg.cap!=null&&a.cap!==sg.cap;
+    h+=quadro("No SIGAA",`<dl class="dl">${dd("Nome no SIGAA",esc(sg.nome||""))}${dd("ID no SIGAA",esc(sg.id))}${dd("Situação no SIGAA",tag(sg.st,sg.st==="Ativo"?"p-vd":"p-vi"))}${dd("Capacidade no SIGAA",sg.cap==null?"":fmt(sg.cap)+(dif?' <span class="pill p-vi">difere do inventário</span>':""))}${dd("Mobiliário",esc(sg.mob||""))}${dd("Climatizada",esc(sg.clim||""))}${dd("Acessível",esc(sg.aces||""))}${dd("Projeção",esc(sg.proj||""))}${dd("Computadores",esc(sg.comp||""))}${dd("Quadro",esc(sg.quadro||""))}${dd("Restrição de uso",sg.restr?esc(sg.restr):"",1)}</dl>`)+
+      `<div data-cor="8">${quadro("Aulas nesta sala",aulasDaSala(a))}</div>`;
+  }
+  h+=`<div data-cor="3">${grupo("Demandas ligadas a esta sala",ds.length?plural(ds.length,"demanda","demandas"):"",ds.length?planilha("amb:"+id+":d",cols(K_DEM,"id","titulo","setor","nat","prio","sit"),ds,{ord:["prio",1],ir:d=>"dem-"+d.id,conta:false}):vazio("Nenhuma demanda aponta para este ambiente. Hoje quase todas guardam o local em texto livre."))}</div>`;
+  return h+alertas("Ambiente",id);
+}
+
+/* ===== Setores ===== */
+function vSetores(){
+  const com=D.setores.filter(s=>(IX.ambSet.get(s.id)||[]).length).sort((a,b)=>IX.ambSet.get(b.id).length-IX.ambSet.get(a.id).length);
+  const semA=D.setores.filter(s=>!(IX.ambSet.get(s.id)||[]).length).sort((a,b)=>((IX.pesSet.get(b.id)||[]).length-(IX.pesSet.get(a.id)||[]).length)||ordAlf(rot(a),rot(b)));
+  const tp=maiores(conta(D.setores,s=>s.tipo),3);
+  return cab("setores","Setores",alterna())+
+    fala("Setores",`São ${plural(D.setores.length,"unidade","unidades")} vindas do SIPAC, a maioria ${juntar(tp.map(x=>`${esc(x[0].toLowerCase())} (${x[1]})`))}. No inventário, ${plural(com.length,"setor responde","setores respondem")} por todas as salas, porque cada ambiente tem um setor principal. Abra um setor para ver as salas, as pessoas e os pedidos dele.`)+
+    (emPlanilha()?planilha("setores",todas(K_SET),[...com,...semA],{ord:["na",-1],ir:s=>"set-"+s.id})
+      :grupo("Setores com ambientes",plural(com.length,"setor","setores"),grade(com.map(cSetor).join("")))+
+       grupo("Demais unidades",plural(semA.length,"unidade","unidades")+" sem ambiente como setor principal",grade(pagina(semA,"set:outros",10,40,cSetor))));
+}
+function pSetor(id){
+  const s=setor(id); if(!s)return naoAchei("setores","setor",id);
+  const as=[...(IX.ambSet.get(id)||[])].sort((a,b)=>ordAlf(a.bloco,b.bloco)||ordCod(a,b)), ps=[...(IX.pesSet.get(id)||[])].sort((a,b)=>ordAlf(a.nome,b.nome)), ds=IX.demSet.get(id)||[], ab=ds.filter(d=>d.sit==="Aberta");
+  const fl=[...(IX.filhos.get(id)||[])].sort((a,b)=>ordAlf(rot(a),rot(b))), nd=s.sigla?(IX.disUni.get(s.sigla)||[]).length:0, bl=maiores(conta(as,a=>a.bloco),3), sup=s.sup&&setor(s.sup);
+  const txt=`${esc(s.nome)}${s.sigla?" ("+esc(s.sigla)+")":""} é ${esc({"Laboratório":"um laboratório","Departamento":"um departamento","Coordenação de curso":"uma coordenação de curso","Programa de pós-graduação":"um programa de pós-graduação","Secretaria":"uma secretaria","Assessoria":"uma assessoria","Núcleo":"um núcleo","Direção":"a direção","Centro":"o centro"}[s.tipo]||"uma unidade")} no SIPAC${sup?" (unidade superior: "+esc(rot(sup))+")":""}. ${as.length?"Responde por "+plural(as.length,"ambiente","ambientes")+" e "+m2(soma(as,a=>a.area))+", principalmente em "+juntar(bl.map(x=>`${esc(x[0])} (${x[1]})`))+". ":"Não é setor principal de nenhum ambiente do inventário. "}${ps.length?"Tem "+plural(ps.length,"pessoa lotada","pessoas lotadas")+". ":""}${ab.length?"Há "+plural(ab.length,"demanda aberta","demandas abertas")+" em seu nome.":""}`;
+  return voltar("setores","Setores")+
+    `<div class="ficha-top"><span class="tipo">Setor ${esc(s.id)}</span>${tag(s.tipo,"p-az")}${s.ct==="Não"?tag("Fora do CT","p-cz"):""}</div>`+
+    cab(SET_IC[s.tipo]||"setores",(s.sigla?s.sigla+" · ":"")+s.nome)+fala(rot(s).length>40?"Setor":rot(s),txt)+
+    meta4([["Ambientes","grade4",fmt(as.length)],["Área","regua",as.length?m2(soma(as,a=>a.area)):"–"],["Pessoas lotadas","pessoas",fmt(ps.length)],["Demandas abertas","prancheta",fmt(ab.length)]])+
+    quadro("Cadastro",`<dl class="dl">${dd("Código no SIPAC",esc(s.cod||""))}${dd("Ligado a",sup?ligSet(s.sup)+(sup.sigla?" · "+esc(sup.nome):""):"")}${dd("Responsável",s.resp?ligPes(s.resp):'<span class="pill p-cz">não informado</span>')}${dd("Cursos que atende",s.cursos?esc(s.cursos):"")}${dd("Disciplinas que oferta",nd?`<button class="lig" type="button" data-ir="uni-${esc(sl(s.sigla))}">${fmt(nd)} disciplinas</button>`:"")}${dd("Unidades ligadas a este setor",fl.map(f=>ligSet(f.id)).join(" · "),1)}${dd("Observação",s.obs?esc(s.obs):"",1)}</dl>`)+
+    `<div data-cor="1">${grupo("Ambientes",plural(as.length,"ambiente","ambientes"),as.length?plAmb("set:"+id+":a",as,["local","nome","tipo","pav","cap","area","sit"],{ord:["local",1],conta:false}):vazio("Nenhum ambiente tem este setor como responsável principal."))}</div>`+
+    `<div data-cor="4">${grupo("Pessoas lotadas",plural(ps.length,"pessoa","pessoas"),ps.length?planilha("set:"+id+":p",cols(K_PES,"nome","cat","cargo","sala"),ps,{ord:["nome",1],ir:p=>"pes-"+p.id,conta:false}):vazio("Nenhuma pessoa lotada neste setor."))}</div>`+
+    `<div data-cor="3">${grupo("Demandas",plural(ds.length,"demanda","demandas"),ds.length?planilha("set:"+id+":d",cols(K_DEM,"id","titulo","tipo","nat","prio","area","sit"),ds,{ord:["prio",1],ir:d=>"dem-"+d.id,conta:false}):vazio("Nenhuma demanda deste setor."))}</div>`+
+    alertas("Setor",id);
+}
+
+/* ===== Pessoas ===== */
+function vPessoas(){
+  const cats=["Docente","Técnico Administrativo","Estagiário"], semSala=D.pessoas.filter(p=>!IX.ocP.has(p.id)), doc=D.pessoas.filter(p=>p.cat==="Docente");
+  const L=D.pessoas.filter(p=>FIL.pes==="Todos"||(FIL.pes==="Sem sala"?!IX.ocP.has(p.id):p.cat===FIL.pes)).sort((a,b)=>ordAlf(a.nome,b.nome));
+  return cab("pessoas","Pessoas",alterna())+
+    fala("Pessoas",`A lista tem ${plural(D.pessoas.length,"pessoa","pessoas")}: ${juntar(cats.map(c=>plural(D.pessoas.filter(p=>p.cat===c).length,c.toLowerCase(),c==="Técnico Administrativo"?"técnicos administrativos":c.toLowerCase()+"s")))}. ${fmt(D.pessoas.length-semSala.length)} têm sala no inventário; ${fmt(doc.filter(p=>!IX.ocP.has(p.id)).length)} docentes ainda aparecem sem ambiente. A busca do topo também acha pessoas pelo nome.`)+
+    chips("Mostrar",[["Todos","Todos ("+fmt(D.pessoas.length)+")"],...cats.map(c=>[c,(c==="Técnico Administrativo"?"Técnicos":c+"s")+" ("+fmt(D.pessoas.filter(p=>p.cat===c).length)+")"]),["Sem sala","Sem sala ("+fmt(semSala.length)+")"]],FIL.pes,"filpes")+
+    (emPlanilha()?planilha("pessoas:"+FIL.pes,todas(K_PES),L,{ord:["nome",1],ir:p=>"pes-"+p.id}):grade(pagina(L,"pes:"+FIL.pes,36,72,cPessoa),1));
+}
+function pPessoa(id){
+  const p=pes(id); if(!p)return naoAchei("pessoas","pessoa",id);
+  const as=(IX.ocP.get(id)||[]).map(amb).filter(Boolean), chefia=D.setores.filter(s=>s.resp===id), lot=setor(p.lot), loc=p.loc&&p.loc!==p.lot?setor(p.loc):null;
+  let tu;
+  if(turmasErro)tu='<p class="dica">Não consegui carregar as turmas.</p>';
+  else if(!T)tu='<p class="dica">Carregando as turmas…</p>';
+  else{const todas2=IX.tPes.get(id)||[];
+    if(!todas2.length)tu='<p class="dica">Nenhuma turma encontrada com este nome entre os docentes.</p>';
+    else{const tem=new Set(todas2.map(i=>T[i][TC.sem]));if(!semFicha||!tem.has(semFicha))semFicha=[...SEMS].reverse().find(s=>tem.has(s));
+      tu=botoesSem(todas2,semFicha)+tabelaTurmas(todas2.filter(i=>T[i][TC.sem]===semFicha),["dis","turma","hor","mat","local"])+'<p class="dica">A ligação é feita pelo nome do docente, que no SIGAA é texto. Ainda não é uma chave do banco: nomes escritos de outro jeito ficam de fora.</p>'}}
+  const txt=`${esc(nomePes(p))} é ${esc((p.cargo||p.cat||"").toLowerCase())}${lot?", com lotação em "+esc(rot(lot)):""}${loc?" e trabalho em "+esc(rot(loc)):""}. ${as.length?"Ocupa "+juntar(as.map(a=>esc(local(a)||a.id)))+". ":"Não está ligado a nenhum ambiente na tabela de ocupação. "}${chefia.length?"Responde por "+juntar(chefia.map(s=>esc(rot(s))))+".":""}`;
+  return voltar("pessoas","Pessoas")+
+    `<div class="ficha-top"><span class="tipo">Pessoa ${esc(p.id)}</span>${tag(p.cat,"p-az")}${p.situ&&p.situ!=="Lotado"?tag(p.situ,"p-vi"):""}${as.length?"":tag("Sem sala","p-cz")}</div>`+
+    cab("pessoa",nomePes(p))+fala("Pessoa",txt)+
+    meta4([["Cargo","pasta",esc(p.cargo||"")],["Situação","check",esc(p.sit||"")],["Lotação","setores",lot?ligSet(p.lot):""],["Onde trabalha","pino",loc?ligSet(p.loc):(lot?ligSet(p.lot):"")]])+
+    `<div data-cor="1">${grupo("Ambientes que ocupa",as.length?plural(as.length,"ambiente","ambientes"):"",as.length?plAmb("pes:"+id+":a",as,["local","nome","tipo","setor","pav","cap","area"],{ord:["local",1],conta:false}):vazio("Nenhum ambiente ligado a esta pessoa."))}</div>`+
+    (chefia.length?`<div data-cor="7">${grupo("Responsável por",plural(chefia.length,"setor","setores"),planilha("pes:"+id+":s",cols(K_SET,"rot","tipo","na","np","nd"),chefia,{ord:["rot",1],ir:s=>"set-"+s.id,conta:false}))}</div>`:"")+
+    `<div data-cor="8">${quadro("Turmas em que aparece como docente",tu)}</div>`+alertas("Pessoa",id);
+}
+
+/* ===== Aulas ===== */
+function vAulas(){
+  if(turmasErro)return cab("cap","Aulas")+fala("Aulas","Não consegui carregar as turmas. Recarregue a página.",3);
+  if(!T)return cab("cap","Aulas")+`<p class="carregando">Carregando as turmas…</p>`;
+  const idx=IX.tSem.get(SEM)||[], dis=new Set(idx.map(i=>T[i][TC.cod]+"|"+T[i][TC.niv])), lig=idx.filter(i=>IX.ambSg.has(T[i][TC.idsg])).length, pres=idx.filter(i=>ocupaSala(T[i])).length;
+  const us=[...IX.disUni.keys()].map(dadosUni).filter(x=>x.nt>0).sort((a,b)=>b.nt-a.nt);
+  return cab("cap","Aulas",alterna())+
+    fala("Aulas",`Em ${SEM}, o SIGAA traz ${plural(idx.length,"turma","turmas")} de ${plural(dis.size,"disciplina","disciplinas")} ligadas ao CT, ${fmt(pres)} delas presenciais e com matriculados. ${fmt(lig)} turmas (${pct(lig,idx.length)}) já chegam a uma sala do inventário; as outras estão sem local ou em sala que ainda não tem ligação. Escolha a unidade que oferta a disciplina.`)+
+    chips("Semestre",SEMS.map(s=>[s,s,!(IX.tSem.get(s)||[]).length]),SEM,"sem")+
+    meta4([["Turmas","cap",fmt(idx.length)],["Disciplinas","livro",fmt(dis.size)],["Matrículas somadas","pessoas",fmt(soma(idx,i=>T[i][TC.mat]))],["Turmas com sala ligada","pino",`${fmt(lig)} de ${fmt(idx.length)} (${pct(lig,idx.length)})`]])+
+    (emPlanilha()?planilha("aulas",todas(kUni()),us,{ord:["nt",-1],ir:x=>"uni-"+sl(x.u)}):grade(us.map(cUni).join("")));
+}
+function pUnidade(id){
+  if(!IX.uniSl.has(id))return naoAchei("aulas","unidade",id);
+  const x=dadosUni(IX.uniSl.get(id)), u=x.u, s=x.s, ds=[...x.ds].sort((a,b)=>ordAlf(a.cod,b.cod)), semTipo=ds.filter(d=>!d.adeq).length;
+  return voltar("aulas","Aulas")+cab(s?(SET_IC[s.tipo]||"cap"):"cap",s?(s.sigla+" · "+s.nome):nomeUni(u))+
+    fala(s?s.sigla:"Unidade",`${s?esc(s.nome):esc(nomeUni(u))} tem ${plural(ds.length,"disciplina","disciplinas")} com turma entre 2022.1 e 2026.2${T?"; "+fmt(x.nd)+" delas têm turma em "+SEM:""}. ${semTipo?fmt(semTipo)+" ainda não têm o tipo de sala adequado definido, o que impede dizer que sala cada turma precisa. ":"Todas já têm o tipo de sala adequado definido. "}Abra uma disciplina para ver as turmas e as salas.`)+
+    chips("Semestre",SEMS.map(s2=>[s2,s2,!T||!(IX.tSem.get(s2)||[]).length]),SEM,"sem")+
+    meta4([["Disciplinas no período","livro",fmt(ds.length)],["Com turma em "+SEM,"cap",T?fmt(x.nd):"…"],["Turmas em "+SEM,"agenda",T?fmt(x.nt):"…"],["Setor","setores",s?ligSet(s.id):'<span class="dica">unidade de outro centro</span>']])+
+    planilha("uni:"+id,cols(kDis(),"cod","nome","niv","ts","tt","adeq","usado"),ds,{ord:["ts",-1],ir:d=>"dis-"+d.cod+"-"+d.niv});
+}
+function pDis(chave){
+  const i=chave.lastIndexOf("-"), d=IX.dis.get(chave.slice(0,i)+"|"+chave.slice(i+1)); if(!d)return naoAchei("aulas","disciplina",chave);
+  const sid=IX.sigla.get(d.uni), idx=T?(IX.tDis.get(d.cod+"|"+d.niv)||[]):[], doSem=idx.filter(x=>T[x][TC.sem]===SEM), salas=new Set(idx.map(x=>IX.ambSg.get(T[x][TC.idsg])).filter(Boolean));
+  let tu;
+  if(turmasErro)tu='<p class="dica">Não consegui carregar as turmas.</p>';
+  else if(!T)tu='<p class="dica">Carregando as turmas…</p>';
+  else tu=tabelaTurmas(idx,["sem","turma","hor","mat","doc","local"]);
+  return voltar("uni-"+sl(d.uni||"Sem unidade"),sid?rot(setor(sid)):nomeUni(d.uni||"Aulas"))+
+    `<div class="ficha-top"><span class="tipo">Disciplina ${esc(d.cod)}</span>${tag(NIVEL[d.niv],"p-az")}${d.adeq?"":tag("Tipo de sala a definir","p-vi")}</div>`+
+    cab("livro",d.cod+" · "+nm(d.nome))+
+    fala("Disciplina",`${esc(nm(d.nome))} é ofertada por ${sid?esc(setor(sid).nome):esc(nomeUni(d.uni||""))}. ${T?`De 2022.1 a 2026.2 teve ${plural(idx.length,"turma","turmas")} e ${fmt(soma(idx,x=>T[x][TC.mat]))} matrículas, em ${plural(salas.size,"sala do inventário","salas do inventário")}; em ${SEM} são ${plural(doSem.length,"turma","turmas")}. `:""}${d.adeq?"O tipo de sala adequado é "+esc(d.adeq.toLowerCase())+".":"O tipo de sala adequado ainda precisa ser definido com o departamento."}`)+
+    meta4([["Unidade que oferta","setores",sid?ligSet(sid):esc(nomeUni(d.uni||""))],["Tipo de sala adequado","porta",d.adeq?esc(d.adeq):""],["Tipo de sala mais usado","relogio",esc(d.usado||"–")],["Leitura do histórico","tabela",esc(d.leit||"")]])+
+    `<div data-cor="8">${quadro("Turmas",tu)}</div>`;
+}
+
+/* ===== Demandas ===== */
+const PERG={P1:"O que precisa de espaço agora?",P2:"O que entra na programação de alocação?",P3:"O que pode esperar uma oportunidade?",M1:"Onde há risco ou insalubridade?",M2:"O que atrapalha o funcionamento?",M3:"O que melhoraria o conforto?"};
+function vDemandas(){
+  const L=D.demandas.filter(d=>FIL.dem==="Todas"||(FIL.dem==="Aberta"?d.sit==="Aberta":d.sit!=="Aberta")), ab=D.demandas.filter(d=>d.sit==="Aberta");
+  const tp=maiores(conta(ab,d=>d.tipo),3), st=maiores(conta(ab.filter(d=>d.setor),d=>d.setor),3);
+  const fx=emPlanilha()?[]:D.listas.prioridades.map(pr=>{const cod=pr.split(" · ")[0], nome=pr.split(" · ")[1]||pr, l=L.filter(d=>d.prio===pr), t2=maiores(conta(l,d=>d.tipo),2), ar=soma(l,d=>d.area);
+    return l.length?{n:cod,rot:nome,q:PERG[cod]||nome,tx:`${plural(l.length,"demanda","demandas")}${ar?" · "+fmt(ar,0)+" m² pedidos":""}.${t2.length?" Mais pedidos: "+juntar(t2.map(x=>`${esc(x[0])} (${x[1]})`))+".":""}`,
+      fim:["Trilha",cod[0]==="M"?"Manutenção e adequação":"Alocação de espaço"],liga:cod==="M1"?"da alocação para a manutenção":"",cards:pagina(l,"dem:"+FIL.dem+":"+cod,4,12,cDem)}:null}).filter(Boolean);
+  return cab("prancheta","Demandas",alterna())+
+    fala("Demandas",`Os setores registraram ${plural(D.demandas.length,"demanda","demandas")}; ${fmt(ab.length)} seguem abertas. Os tipos mais pedidos são ${juntar(tp.map(x=>`${esc(x[0])} (${x[1]})`))}, e quem mais pede é ${juntar(st.map(x=>`${esc(rot(setor(x[0])))} (${x[1]})`))}. A ordem é a de prioridade: primeiro a alocação de espaço (P1 a P3), depois a manutenção (M1 a M3).`)+
+    chips("Mostrar",[["Aberta","Abertas ("+fmt(ab.length)+")"],["Encerrada","Encerradas ("+fmt(D.demandas.length-ab.length)+")"],["Todas","Todas ("+fmt(D.demandas.length)+")"]],FIL.dem,"fildem")+
+    (emPlanilha()?planilha("demandas:"+FIL.dem,todas(K_DEM),L,{ord:["prio",1],ir:d=>"dem-"+d.id,vazio:"Nenhuma demanda neste recorte."}):(fx.length?faixas(fx):vazio("Nenhuma demanda neste recorte.")));
+}
+function pDem(id){
+  const d=IX.dem.get(id); if(!d)return naoAchei("demandas","demanda",id);
+  const s=setor(d.setor), fora=d.tipo&&!IX.tipo.has(d.tipo), vs=String(d.vinc||"").split(/\s*;\s*/).filter(Boolean), ad=D.listas.aderencias[d.ader], pr=String(d.prio||"").split(" · ");
+  return voltar("demandas","Demandas")+
+    `<div class="ficha-top"><span class="tipo">Demanda ${esc(d.id)}</span>${tag(d.sit,DEM_COR[d.sit])}${d.prio?tag(d.prio,pr[0][0]==="P"?"p-tc":"p-vi"):""}</div>`+
+    cab(DEM_IC[d.nat]||"prancheta",d.titulo)+
+    fala("Demanda",`${s?esc(s.nome)+(s.sigla?" ("+esc(s.sigla)+")":""):"Um setor sem registro no SIPAC"} pede ${esc((d.nat||"").toLowerCase())}${d.tipo?" de "+esc(d.tipo.toLowerCase()):""}${d.area!=null&&d.area!==""?", com "+fmt(+d.area,0)+" m²":""}. ${d.prio?"Prioridade "+esc(pr[0])+", "+esc((pr[1]||"").toLowerCase())+(d.crit?": "+esc(d.crit.charAt(0).toLowerCase()+d.crit.slice(1)):"")+". ":""}${d.sit==="Aberta"?"Segue aberta.":"Situação: "+esc(d.sit.toLowerCase())+"."}`)+
+    meta4([["Quem pede","setores",s?ligSet(d.setor):""],["Tipo de espaço",icTipo(d.tipo),d.tipo?esc(d.tipo)+(fora?' <span class="pill p-vi">fora da lista</span>':""):""],["Natureza",DEM_IC[d.nat]||"prancheta",esc(d.nat||"")],["Local","pino",d.amb?ligAmb(d.amb):esc(d.local||"")]])+
+    quadro("Pedido",`<dl class="dl">${dd("Trilha",d.prio?(pr[0][0]==="M"?"Manutenção e adequação":"Alocação de espaço"):"")}${dd("Quantidade",esc(d.qtd||""))}${dd("Área pedida",d.area!=null&&d.area!==""?fmt(+d.area,0)+" m²":"")}${dd("Aderência",d.ader?esc(d.ader)+(ad?`<br><span class="dica">${esc(ad)}</span>`:""):"")}${dd("Critério",esc(d.crit||""))}${dd("Vinculada a",vs.map(v=>IX.dem.has(v)?`<button class="lig" type="button" data-ir="dem-${esc(v)}" title="${esc(IX.dem.get(v).titulo)}">${esc(v)}</button>`:esc(v)).join(" · "))}${dd("Justificativa",d.just?esc(d.just):"",1)}${dd("Desfecho",d.desf?esc(d.desf):"",1)}${dd("Documento",d.doc?esc(d.doc)+(d.pag?" · "+esc(d.pag):""):"",1)}${dd("Observação",d.obs?esc(d.obs):"",1)}</dl>`)+
+    (d.amb?`<div data-cor="1">${grupo("A sala citada","",plAmb("dem:"+id+":a",[amb(d.amb)].filter(Boolean),["local","nome","tipo","setor","pav","cap","area","sit"],{conta:false}))}</div>`:`<div class="aviso">${ico("info")}<div><b>Sem ambiente ligado.</b> O local desta demanda é texto livre${d.local?" (“"+esc(d.local)+"”)":""}. Quando ela se referir a uma sala que existe, ligar ao identificador do ambiente faz a demanda aparecer na página da sala.</div></div>`)+
+    alertas("Demanda",id);
+}
+
+/* ===== Eventos ===== */
+function vEventos(){
+  const ev=D.eventos||[];
+  const cEv=e=>{const a=amb(e.amb), pr=setor(e.promotor), dt=new Date(e.inicio), fim=new Date(e.fim);
+    return card({ir:a?"amb-"+a.id:null,cor:6,ic:"agenda",marca:isNaN(dt)?"Sem data":diaEv(dt)+" · "+horaEv(dt),tags:[e.publico==="Sim"?"Aberto ao público":"Interno"],pills:[e.exemplo?["Exemplo","p-cz"]:null],
+      t:e.titulo,d:[a?local(a)+(a.nome?" · "+a.nome:""):null,pr?"Promove: "+rot(pr):null,isNaN(dt)||isNaN(fim)?null:"das "+horaEv(dt)+" às "+horaEv(fim)].filter(Boolean).join(" · "),pe:a?"Ver onde é":""})};
+  return cab("agenda","Eventos",alterna())+
+    fala("Eventos",`Esta seção ainda não tem dados reais: a tabela de eventos nasce vazia e traz uma linha de exemplo, para mostrar o formato. No sistema, quem promove cadastra o evento com data, hora e sala, e a comunidade vê aqui onde cada um acontece, com caminho até a sala e o bloco.`,3)+
+    (emPlanilha()?planilha("eventos",todas(K_EV),ev,{ord:["quando",1],ir:e=>amb(e.amb)?"amb-"+e.amb:null,vazio:"Nenhum evento cadastrado."})+
+        `<div class="aviso">${ico("info")}<div><b>A criar.</b> A agenda de eventos (lista por dia e por bloco) e o mapa de eventos (o mapa do CT com os eventos do dia) ainda não existem; dependem do cadastro de eventos e do mapa das salas.</div></div>`
+      :grade(ev.map(cEv).join("")+
+        card({cor:6,ic:"agenda",sem:1,marca:"Agenda do CT",tags:["Página"],pills:[["A criar","p-cz"]],t:"Agenda de eventos",d:"Lista dos próximos eventos, por dia e por bloco, alimentada por quem promove.",pe:"Ainda não existe"})+
+        card({cor:6,ic:"pino",sem:1,marca:"Mapa de eventos",tags:["Página"],pills:[["A criar","p-cz"]],t:"Mapa de eventos",d:"O mapa do CT com os eventos do dia marcados na sala onde acontecem.",pe:"Depende do mapa das salas"})));
+}
+
+/* ===== A corrigir ===== */
+function vCorrigir(){
+  const ks=IX.pendTipos, tabs=maiores(conta(D.pendencias,p=>p.t),3), nAmb=D.ambientes.filter(a=>pendN("Ambiente",a.id)).length;
+  return cab("alerta","A corrigir",alterna())+
+    fala("A corrigir",`A migração para o banco simplificado encontrou ${plural(D.pendencias.length,"pendência","pendências")} em ${plural(ks.length,"tipo","tipos")} de problema, a maior parte em ${juntar(tabs.map(x=>`${esc(x[0])} (${x[1]})`))}. Cada item é um tipo de problema, com o número de registros e o que fazer. A correção é feita na planilha de inventário; depois os dados são carregados de novo.`)+
+    meta4([["Pendências","alerta",fmt(D.pendencias.length)],["Ambientes com pendência","grade4",fmt(nAmb)+" de "+fmt(D.ambientes.length)],["Blocos sem coordenada","pino",fmt(D.blocos.filter(b=>b.lat==null).length)+" de "+fmt(D.blocos.length)],["Disciplinas sem tipo de sala","livro",fmt(D.disciplinas.filter(d=>!d.adeq).length)+" de "+fmt(D.disciplinas.length)]])+
+    (emPlanilha()?planilha("corrigir",todas(K_PEND),ks,{ord:["n",-1],ir:k=>"pend-"+(ks.indexOf(k)+1)}):grade(ks.map(cPend).join("")));
+}
+function pPend(id){
+  const i=+id-1, k=IX.pendTipos[i]; if(!k)return naoAchei("corrigir","tipo de pendência",id);
+  const ds=new Set(k.itens.map(x=>x.d||"")), varias=ds.size>1, anot=new Map(), semId=[];
+  k.itens.forEach(p=>{const ids=String(p.id||"").split(/\s*,\s*/).filter(Boolean);if(!ids.length)semId.push(p);ids.forEach(x=>{if(!anot.has(x))anot.set(x,p.d||"")})});
+  const u=[...anot.keys()];
+  const E={Ambiente:[x=>amb(x),()=>cols(K_AMB,"local","nome","tipo","setor","cap","area"),r=>"amb-"+r.id,r=>r.id,1],
+    Bloco:[x=>IX.blo.get(x),()=>cols(K_BLO,"sigla","nome","na","area","mapa"),r=>"blo-"+sl(r.sigla),r=>r.sigla,2],
+    Setor:[x=>setor(x),()=>cols(K_SET,"rot","tipo","sup","resp","na"),r=>"set-"+r.id,r=>r.id,7],
+    Pessoa:[x=>pes(x),()=>cols(K_PES,"nome","cat","cargo","lot","sala"),r=>"pes-"+r.id,r=>r.id,4],
+    Demanda:[x=>IX.dem.get(x),()=>cols(K_DEM,"id","titulo","setor","tipo","prio","sit"),r=>"dem-"+r.id,r=>r.id,3]}[k.t];
+  const regs=E?u.map(x=>E[0](x)).filter(Boolean):[], achou=new Set(regs.map(r=>E[3](r))), soltos=u.filter(x=>!achou.has(x));
+  const cs=E?E[1]().concat(varias?[{k:"anot",t:"Anotação",v:r=>anot.get(E[3](r))||""}]:[]):[];
+  const oque=!varias&&[...ds][0]?esc([...ds][0])
+    :(u.length?`${plural(u.length,"registro tem","registros têm")} esta pendência, cada um com a sua anotação na última coluna. A correção é feita na planilha de inventário; depois os dados são carregados de novo.`
+      :`${plural(k.itens.length,"anotação trata","anotações tratam")} da tabela inteira, sem apontar um registro. A correção é feita na planilha de inventário; depois os dados são carregados de novo.`);
+  const simples=(ths,trs)=>`<div class="tabwrap livre"><table class="q"><thead><tr>${ths.map(t=>`<th>${t}</th>`).join("")}</tr></thead><tbody>${trs.join("")}</tbody></table></div>`;
+  return voltar("corrigir","A corrigir")+
+    `<div class="ficha-top"><span class="tipo">Pendência em ${esc(k.t)}</span>${tag(u.length>k.itens.length?`${plural(k.itens.length,"ocorrência","ocorrências")} em ${plural(u.length,"registro","registros")}`:plural(k.itens.length,"registro","registros"),"p-vi")}</div>`+
+    cab("alerta",k.p)+fala("O que fazer",oque,3)+
+    (regs.length?`<div data-cor="${E[4]}">${planilha("pend:"+id,cs,regs,{ir:E[2]})}</div>`:"")+
+    (soltos.length?quadro(regs.length?"Citados que não estão nesta versão dos dados":"Registros citados",simples(["Registro","Anotação"],soltos.map(x=>`<tr><td class="a nq">${esc(x)}</td><td>${esc(anot.get(x)||"")}</td></tr>`))):"")+
+    (semId.length&&varias?quadro("Anotações",simples(["Anotação"],semId.map(p=>`<tr><td>${esc(p.d||"")}</td></tr>`))):"")+
+    (!u.length&&!varias?`<div class="aviso">${ico("info")}<div>Esta pendência vale para a tabela inteira, sem um registro específico.</div></div>`:"");
+}
+
+/* ===== Sobre ===== */
+function vSobre(){
+  const m=D.meta, tb=[["Bloco","Os prédios do CT",D.blocos.length,"blocos"],["Tipo de espaço","A lista única de usos, com o tipo do MEC",D.tipos.length,"ambientes"],["Ambiente","Cada sala, com tipo, setor, capacidade e área",D.ambientes.length,"ambientes"],["Setor","As unidades do SIPAC",D.setores.length,"setores"],["Pessoa","Servidores lotados no CT",D.pessoas.length,"pessoas"],["Ocupação","Qual pessoa usa qual ambiente",D.ocupacoes.length,null],
+    ["Disciplina","Componentes com turma no período",D.disciplinas.length,"aulas"],["Turma","Turmas de 2022.1 a 2026.2",T?T.length:null,"aulas"],["Demanda","Pedidos por espaço ou melhoria",D.demandas.length,"demandas"],["Evento","Onde e quando acontece cada evento",0,"eventos"]];
+  const mc=(ic,t)=>`<div class="mapc">${ico(ic)}<div>${t}</div></div>`;
+  return cab("info","Sobre o protótipo")+
+    fala("Sobre o protótipo",`Este é um dos dois protótipos do sistema de espaços do CT. Aqui, o banco aparece como um portal para consulta, em pastilhas e em planilhas; no outro, como um painel de gestão, com tabelas, filtros e anotações. Os dois leem os mesmos dados, e nenhum deles altera as planilhas de origem.`,3)+
+    `<div class="mapa">`+
+    mc("camadas",`<b>Três camadas.</b> Na primeira, o Início mostra as oito dimensões em pastilhas. Na segunda, a página de cada seção pode ser vista em pastilhas ou em planilha: o botão fica ao lado do título e a escolha vale para todas as seções e para a busca. Da terceira em diante (a página de um bloco, de um tipo, de um setor, de uma unidade ou de uma sala), as listas vêm só em planilha.`)+
+    mc("tabela",`<b>Como usar a planilha.</b> Clique no título de uma coluna para ordenar; clique de novo para inverter. Clique numa linha, ou no nome sublinhado da primeira coluna, para abrir o registro. Listas longas mostram 200 linhas por vez, com o botão Mostrar mais no fim. No computador, o cabeçalho da planilha fica preso no alto enquanto a página rola.`)+
+    mc("grade4",`<b>Oito seções, cada uma com a sua cor.</b> A cor diz o tipo de registro em qualquer página: uma pastilha azul é sempre uma disciplina, uma verde é sempre uma pessoa.<div class="leg cores">${SECOES.map(s=>`<div><span class="ponto" data-cor="${s.n}"></span>${esc(s.t)}</div>`).join("")}</div>`)+
+    mc("busca",`<b>Busca no topo.</b> Fica na barra superior, sempre visível. Procura ao mesmo tempo em blocos, ambientes, setores, pessoas, disciplinas e demandas, pelo nome, pela sigla ou pelo código. A tecla Esc limpa a busca.`)+
+    mc("bandeira",`<b>Etiquetas.</b><div class="leg"><div><span class="pill p-vi">A conferir</span> o cadastro tem pendência; a lista está em A corrigir.</div><div><span class="pill p-cz">Sem coordenada</span> o bloco ainda não entra no mapa.</div><div><span class="pill p-cz">Sem sala</span> a pessoa não está ligada a um ambiente.</div><div><span class="pill p-vi">Sala a definir</span> a disciplina não tem tipo de sala adequado.</div><div><span class="pill p-cz">A criar</span> ainda não existe.</div></div>`)+
+    mc("predio",`<b>Do bloco à sala.</b> Em Blocos, cada prédio abre a planilha das suas salas, com filtro por pavimento. Em Ambientes, as salas vêm por tipo de espaço. A página da sala reúne quem ocupa, o cadastro no SIGAA, a grade de aulas da semana e as demandas ligadas.`)+
+    mc("tabela",`<b>De onde vêm os dados.</b> Planilha-modelo ${esc(m.versao)}, gerada a partir do inventário de espaços salvo em ${esc(m.inventario)}; da ${esc(m.turmas)}; e do ${esc(m.demandas)}. A página não leva matrícula, CPF nem dados de alunos.`)+
+    mc("alerta",`<b>O que o protótipo não faz.</b> Não edita cadastros, não tem fotos e não tem login. O mapa mostra cada bloco como um sólido, tirado das paredes da planta do térreo; a página de cada bloco traz a planta de cada pavimento desenhado no PDF (térreo e os andares de cima da coluna da direita da folha), com as salas clicáveis, ligadas ao inventário pela área e pelo nome (ligação ainda a conferir). O Multimídia, o 2º andar do L e do LARHENA e o RECO não estão desenhados no PDF. A ligação entre docente e pessoa é feita pelo nome (${fmt(m.docentes_ligados)} de ${fmt(m.docentes_turmas)} nomes das turmas). Os identificadores ainda podem mudar enquanto a planilha é corrigida.`)+
+    `</div>`+
+    grupo("As tabelas do banco","dez tabelas, no lugar das 27 do sistema anterior",`<div class="tabwrap livre"><table class="q"><thead><tr><th>Tabela</th><th>O que guarda</th><th class="n">Linhas</th><th>Onde aparece</th></tr></thead><tbody>${tb.map(x=>`<tr><td class="a">${x[0]}</td><td>${x[1]}</td><td class="n">${x[2]==null?"…":fmt(x[2])}</td><td>${x[3]?`<button class="lk" type="button" data-ir="${x[3]}">${esc(SEC[x[3]].t)} ${ico("desce")}</button>`:'<span class="adef">nas páginas de sala e de pessoa</span>'}</td></tr>`).join("")}</tbody></table></div>`)+
+    grupo("O que fica para depois","decisões adiadas até a correção da planilha",`<ul class="ck">${["<b>Corrigir os cadastros na planilha de inventário</b> e carregar os dados de novo nos dois protótipos.","<b>Fixar os identificadores</b> de ambiente, setor e pessoa, para que as ligações entre as tabelas não se percam.","<b>Fechar as relações entre as tabelas</b>: sala e setor, sala e pessoa, turma e sala, demanda e sala.","<b>Lista única de tipos de espaço</b> e código oficial de bloco e de sala.","<b>O que é público</b>: nomes de ocupantes, demandas e eventos."].map(t=>`<li>${ico("check")}<span>${t}</span></li>`).join("")}</ul>`);
+}
+
+/* ===== Busca ===== */
+let INDICE=null;
+function montarIndice(){
+  const n=x=>sa(x.filter(Boolean).join(" "));
+  INDICE=[
+    {t:"Blocos",sec:"blocos",mini:0,pl:l=>planilha("busca:blo",todas(K_BLO),l,{ir:b=>"blo-"+sl(b.sigla),passo:50,conta:false}),l:D.blocos.map(b=>({o:b,x:n([b.sigla,b.nome,b.cuida]),f:()=>cBloco(b)}))},
+    {t:"Ambientes",sec:"ambientes",mini:0,pl:l=>plAmb("busca:amb",l,["local","nome","tipo","setor","pav","cap","area","sit"],{passo:50,conta:false}),l:D.ambientes.map(a=>({o:a,x:n([a.id,local(a),a.nome,a.tipo,rot(setor(a.setor)),a.sg&&a.sg.nome,...(IX.ocA.get(a.id)||[]).map(p=>pes(p)&&pes(p).nome)]),f:()=>cAmb(a)}))},
+    {t:"Setores",sec:"setores",mini:0,pl:l=>planilha("busca:set",todas(K_SET),l,{ir:s=>"set-"+s.id,passo:50,conta:false}),l:D.setores.map(s=>({o:s,x:n([s.id,s.sigla,s.nome,s.tipo]),f:()=>cSetor(s)}))},
+    {t:"Pessoas",sec:"pessoas",mini:1,pl:l=>planilha("busca:pes",todas(K_PES),l,{ir:p=>"pes-"+p.id,passo:50,conta:false}),l:D.pessoas.map(p=>({o:p,x:n([p.id,p.nome,p.cargo,rot(setor(p.lot))]),f:()=>cPessoa(p)}))},
+    {t:"Disciplinas",sec:"aulas",mini:1,pl:l=>planilha("busca:dis",cols(kDis(),"cod","nome","niv","uni","ts","tt","adeq"),l,{ir:d=>"dis-"+d.cod+"-"+d.niv,passo:50,conta:false}),l:D.disciplinas.map(d=>({o:d,x:n([d.cod,d.nome,d.uni]),f:()=>cDis(d)}))},
+    {t:"Demandas",sec:"demandas",mini:0,pl:l=>planilha("busca:dem",todas(K_DEM),l,{ir:d=>"dem-"+d.id,passo:50,conta:false}),l:D.demandas.map(d=>({o:d,x:n([d.id,d.titulo,d.tipo,d.local,rot(setor(d.setor)),d.nat]),f:()=>cDem(d)}))}
+  ];
+}
+function vBusca(){
+  if(!INDICE)montarIndice();
+  const termos=sa(BUSCA).split(/\s+/).filter(Boolean), gs=INDICE.map(g=>({g,l:g.l.filter(i=>termos.every(t=>i.x.includes(t)))})).filter(x=>x.l.length), tot=soma(gs,x=>x.l.length);
+  return `<div class="cab"><span class="n">${ico("busca")}</span><h2>Resultado da busca</h2>${alterna()}</div>`+
+    `<p class="kicker" style="margin:0">${tot?`${plural(tot,"registro encontrado","registros encontrados")} para <b>${esc(BUSCA.trim())}</b>${gs.length>1?": "+juntar(gs.map(x=>`${fmt(x.l.length)} em ${esc(x.g.t.toLowerCase())}`)):""}.`:`Nada encontrado para <b>${esc(BUSCA.trim())}</b>. Tente outra palavra, uma sigla ou um código; a tecla Esc limpa a busca.`}</p>`+
+    gs.map(x=>`<div data-cor="${SEC[x.g.sec].n}">${grupo(x.g.t,plural(x.l.length,"resultado","resultados"),emPlanilha()?x.g.pl(x.l.map(i=>i.o)):grade(pagina(x.l,"busca:"+x.g.t,x.g.mini?12:8,24,i=>i.f()),x.g.mini))}</div>`).join("");
+}
+
+/* ===== Navegação ===== */
+const TELAS={inicio:vInicio,blocos:vBlocos,ambientes:vAmbientes,setores:vSetores,pessoas:vPessoas,aulas:vAulas,demandas:vDemandas,eventos:vEventos,corrigir:vCorrigir,sobre:vSobre};
+const PAGINAS={blo:pBloco,tipo:pTipo,amb:pAmb,set:pSetor,pes:pPessoa,uni:pUnidade,dis:pDis,dem:pDem,pend:pPend};
+function lerRota(h){
+  h=String(h||"").replace(/^#/,"")||"inicio";
+  if(TELAS[h])return{sec:h,txt:h};
+  const m=/^(blo|tipo|amb|set|pes|uni|dis|dem|pend)-(.+)$/.exec(h);
+  return m?{sec:PAI[m[1]],pag:m[1],id:m[2],txt:h}:{sec:"inicio",txt:"inicio"};
+}
+function desenhar(){
+  const tela=$("#tela"), b=BUSCA.trim()!=="";
+  if(!D)return;
+  DICA_PL=0;
+  const h=b?vBusca():(ROTA.pag?PAGINAS[ROTA.pag](ROTA.id):TELAS[ROTA.sec]()), cor=b?null:(SEC[ROTA.sec]?SEC[ROTA.sec].n:null);
+  if(cor)tela.dataset.cor=cor; else tela.removeAttribute("data-cor");
+  tela.innerHTML=h; ajustaPlanilhas(); ajustaPlanta();
+  $$(".item").forEach(i=>(!b&&i.dataset.sec===ROTA.sec)?i.setAttribute("aria-current","page"):i.removeAttribute("aria-current"));
+  const at=$(".item[aria-current]"); if(at&&at.parentNode.scrollWidth>at.parentNode.clientWidth)at.scrollIntoView({block:"nearest",inline:"center"});
+}
+function irPara(h,empilhar){
+  ROTA=lerRota(h); BUSCA=""; $("#q").value=""; LIM={}; semFicha=null; FIL.pav="Todos";
+  desenhar(); window.scrollTo({top:0});
+  if(location.hash!=="#"+ROTA.txt){try{empilhar?history.pushState(null,"","#"+ROTA.txt):history.replaceState(null,"","#"+ROTA.txt)}catch(e){}}
+}
+document.addEventListener("click",e=>{
+  const mais=e.target.closest("[data-mais]"); if(mais){LIM[mais.dataset.mais]=+mais.dataset.n;desenhar();return}
+  const sem=e.target.closest("[data-sem]"); if(sem){SEM=sem.dataset.sem;desenhar();return}
+  const sf=e.target.closest("[data-semf]"); if(sf){semFicha=sf.dataset.semf;desenhar();return}
+  const fp=e.target.closest("[data-filpes]"); if(fp){FIL.pes=fp.dataset.filpes;desenhar();return}
+  const fd=e.target.closest("[data-fildem]"); if(fd){FIL.dem=fd.dataset.fildem;desenhar();return}
+  const pv=e.target.closest("[data-pav]"); if(pv){FIL.pav=pv.dataset.pav;desenhar();return}
+  const vt=e.target.closest("[data-vista]");
+  if(vt){if(vt.dataset.vista!==VISTA){VISTA=vt.dataset.vista;try{localStorage.setItem("espacos-ct-vista",VISTA)}catch(x){}LIM={};desenhar();if(e.detail===0){const el=$(`[data-vista="${VISTA}"]`);if(el)el.focus()}}return}
+  const od=e.target.closest("[data-ord]");
+  if(od){const v=od.dataset.ord, i=v.lastIndexOf("|"), id=v.slice(0,i), k=v.slice(i+1), st=ORD[id]||(ORD[id]={k:null,d:1});
+    if(st.k===k)st.d=-st.d; else{st.k=k;st.d=od.parentNode.classList.contains("n")?-1:1}      /* números começam do maior */
+    desenhar(); if(e.detail===0){const el=$$("[data-ord]").find(x=>x.dataset.ord===v);if(el)el.focus()} return}
+  const b=e.target.closest("[data-ir]");
+  if(b){if(b.tagName==="TR"&&String(window.getSelection?window.getSelection():"").trim())return;     /* quem está selecionando texto na linha não quer abrir o registro */
+    if(b.tagName==="A")e.preventDefault();irPara(b.dataset.ir,true);return}
+  const c=e.target.closest(".item"); if(c)irPara(c.dataset.sec,true);
+});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches(".pino[data-ir],.sol[data-ir]")){e.preventDefault();irPara(e.target.dataset.ir,true)}});
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-pavpl]");if(t){PAV_PL=t.dataset.pavpl;const y=window.scrollY;desenhar();window.scrollTo({top:y})}});
+function destacaSala(e){
+  const g=e.target.closest&&e.target.closest("#tela .sala[data-sala]"), box=$("#tela .sala-info"); if(!box||!PLANTAS)return;
+  document.querySelectorAll("#tela .sala.on").forEach(x=>x.classList.remove("on"));
+  if(g){g.classList.add("on");box.innerHTML=infoSala(+g.dataset.sala,g.closest("[data-sgpl]").dataset.sgpl)}
+  else if(e.type==="focusout"||e.type==="mouseout")box.innerHTML=box.dataset.ini;
+}
+["mouseover","focusin","mouseout","focusout"].forEach(t=>document.addEventListener(t,destacaSala));
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches(".sala[data-ir]")){e.preventDefault();irPara(e.target.dataset.ir,true)}});
+function destacaBloco(e){
+  const g=e.target.closest&&e.target.closest("#tela .sol[data-sg]"), box=$("#tela .mapa-info"); if(!box||!MAPA)return;
+  document.querySelectorAll("#tela .sol.on").forEach(x=>x.classList.remove("on"));
+  if(g){g.classList.add("on");box.innerHTML=infoBloco(g.dataset.sg,MAPA)}else if(e.type==="focusout"||e.type==="mouseout")box.innerHTML=box.dataset.ini;
+}
+["mouseover","focusin","mouseout","focusout"].forEach(t=>document.addEventListener(t,destacaBloco));
+const elQ=$("#q"); let tBusca=null;
+elQ.addEventListener("input",()=>{clearTimeout(tBusca);tBusca=setTimeout(()=>{BUSCA=elQ.value;LIM={};desenhar();window.scrollTo({top:0})},140)});
+elQ.addEventListener("keydown",e=>{if(e.key==="Escape"){clearTimeout(tBusca);BUSCA="";elQ.value="";desenhar()}});
+const doEndereco=()=>{const h=(location.hash||"#inicio").slice(1);if(h!==ROTA.txt)irPara(h,false)};
+window.addEventListener("hashchange",doEndereco);
+window.addEventListener("popstate",doEndereco);
+let qAjuste=0;
+window.addEventListener("resize",()=>{cancelAnimationFrame(qAjuste);qAjuste=requestAnimationFrame(ajustaPlanilhas)});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{ajustaPlanilhas();ajustaPlanta()});
+
+/* ===== Carga: dois arquivos publicados ao lado da página; na cópia de arquivo único, vêm embutidos ===== */
+const carrega=n=>{const e=document.getElementById("emb-"+n);return e?new Promise(r=>r(JSON.parse(e.textContent))):fetch(n+".json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})};
+ROTA=lerRota(location.hash);
+carrega("dados").then(j=>{
+  D=j; indexar();
+  $("#rodapeDados").textContent=`Versão 6 do protótipo do portal (24/11/2026), com os dados da planilha-modelo ${D.meta.versao} (inventário de ${D.meta.inventario}). Em caso de divergência, vale a informação do sistema oficial.`;
+  irPara(ROTA.txt,false);
+  carrega("plantas").then(p=>{PLANTAS=p;if(/^#(blo|amb)-/.test(location.hash)){const y=window.scrollY;desenhar();window.scrollTo({top:y})}},()=>{});
+  carrega("mapa").then(m=>{MAPA=m;D.blocos.forEach(b=>{const c=m.blocos[b.sigla];if(c){b.lat=c.c[0];b.lon=c.c[1]}});const y=window.scrollY;desenhar();window.scrollTo({top:y})},()=>{});
+  return carrega("turmas").then(t=>{T=t.slice(1);indexarTurmas();const y=window.scrollY;desenhar();window.scrollTo({top:y})},()=>{turmasErro=true;desenhar()});
+},()=>{$("#tela").innerHTML='<p class="carregando">Não consegui carregar os dados do protótipo. Recarregue a página.</p>'});
+</script>
+
+</body>
+</html>
