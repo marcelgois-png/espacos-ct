@@ -1197,7 +1197,7 @@ function plantaBloco(b,o){
   }).join("");
   const cods=salas.filter(s=>s.lx!=null&&s.c&&catSala(s,b.sigla,f.dono)!=="out").map(s=>`<text class="cod${o.destaque&&s.amb===o.destaque?" claro":""}" data-s="${s.i}" x="${s.lx}" y="${s.ly}" font-size="${fs}" dominant-baseline="central">${esc(s.c)}</text>`).join("");
   const rosa=`<g class="rosa"></g>`;                 /* norte e escala: desenhados por ajustaPlanta() no tamanho da tela */
-  const svg=`<svg class="planta-svg" data-sgpl="${esc(b.sigla)}" viewBox="${vx} ${vy} ${vw} ${vh}" role="img" aria-label="Planta do ${esc(PAVS_PL.find(p=>p[0]===pav)[1])} do bloco ${esc(b.sigla)}, com o norte para cima">`+
+  const svg=`<svg class="planta-svg" data-sgpl="${esc(b.sigla)}" viewBox="${vx} ${vy} ${vw} ${vh}" role="img" aria-label="Planta do ${esc(PAVS_PL.find(p=>p[0]===pav)[1])} do bloco ${esc(b.sigla)}, na orientação das plantas do CT${PLANTAS.norte?`, com o norte a ${Math.round(PLANTAS.norte)} graus da vertical`:""}">`+
     `<path class="contorno" d="${P.contorno}" fill-rule="evenodd"/>${pav!=="T"?`<path class="proj" d="${terreo.contorno}" fill-rule="evenodd"/>`:""}${g}<path class="par" d="${P.paredes}" fill-rule="evenodd"/>${f.div?`<path class="solbl" d="${f.sol}"/>`:""}${cods}${rosa}</svg>`;
   if(o.compacta)return`<div class="mapawrap pl">${svg}</div>`;
   const nAmbPav=(IX.ambBlo.get(b.sigla)||[]).filter(a=>a.pav===PAVS_PL.find(p=>p[0]===pav)[1]).length;
@@ -1205,7 +1205,7 @@ function plantaBloco(b,o){
   const ini=`<span class="rot">Planta · ${esc(PAVS_PL.find(p=>p[0]===pav)[1])}</span><b>${plural(salas.filter(s=>catSala(s,b.sigla,f.dono)!=="out").length,"sala desenhada","salas desenhadas")}</b><p>${plural(lig,"sala ligada","salas ligadas")} a ${nAmbPav} ${nAmbPav===1?"ambiente":"ambientes"} do inventário neste pavimento. Passe o cursor sobre uma sala para ver os dados; clique para abrir o ambiente.</p>`;
   const leg=CATS.filter(([k])=>cont[k]||k==="out"&&salas.some(s=>catSala(s,b.sigla,f.dono)==="out")).map(([k,t])=>`<li><i class="c-${k}"></i><span>${esc(t)}</span>${cont[k]?`<b>${fmt(cont[k])}</b>`:""}</li>`).join("");
   return quadro("Planta do bloco",botoes+`<div class="planta-bl"><div class="mapawrap pl">${svg}</div><div class="mapa-lado"><div class="mapa-info sala-info" aria-live="polite" data-ini="${esc(ini)}">${ini}</div>`+
-    `<ul class="leg-planta">${leg}</ul><p class="dica">Desenho tirado da ${esc(PLANTAS.fonte)}, com o norte para cima.${pav!=="T"?" A planta deste andar está na coluna da direita da folha e foi encaixada sobre o térreo pelas paredes; a linha cinza tracejada é o contorno do térreo.":""}${f.div?" A linha tracejada vermelha marca a parte do prédio que é deste bloco no térreo.":""} Sala desenhada como ponto: a planta não fecha o contorno dela. A ligação com o inventário foi feita pela área e pelo nome e ainda precisa ser conferida.</p></div></div>`);
+    `<ul class="leg-planta">${leg}</ul><p class="dica">Desenho tirado da ${esc(PLANTAS.fonte)}, ${PLANTAS.norte?`na orientação das plantas do CT; o norte fica a ${Math.round(PLANTAS.norte)}° da vertical, no sentido horário (seta N).`:"com o norte para cima."}${pav!=="T"?" A planta deste andar está na coluna da direita da folha e foi encaixada sobre o térreo pelas paredes; a linha cinza tracejada é o contorno do térreo.":""}${f.div?" A linha tracejada vermelha marca a parte do prédio que é deste bloco no térreo.":""} Sala desenhada como ponto: a planta não fecha o contorno dela. A ligação com o inventário foi feita pela área e pelo nome e ainda precisa ser conferida.</p></div></div>`);
 }
 /* Na página do ambiente: a planta do pavimento com a sala em destaque (quando a sala da planta está ligada ao ambiente) */
 function ondeFica(a,b){
@@ -1213,7 +1213,7 @@ function ondeFica(a,b){
   const s=PLANTAS.salas.find(x=>x.amb===a.id); if(!s)return"";
   const n=PAVS_PL.find(p=>p[0]===s.pav)[1];
   return quadro("Onde fica",plantaBloco(b,{destaque:a.id,pav:s.pav,compacta:true})+
-    `<p class="dica">Em destaque, a sala na planta do ${esc(n==="Térreo"?"térreo":n.toLowerCase())} do bloco ${esc(b.sigla)}${s.cod?" (código "+esc(s.cod)+" na planta)":""}, com o norte para cima. ${s.conf==="média"?"A ligação entre a sala da planta e este ambiente é provável e ainda precisa ser conferida. ":""}Clique em outra sala para abrir o ambiente dela.</p>`);
+    `<p class="dica">Em destaque, a sala na planta do ${esc(n==="Térreo"?"térreo":n.toLowerCase())} do bloco ${esc(b.sigla)}${s.cod?" (código "+esc(s.cod)+" na planta)":""}, na orientação das plantas do CT${PLANTAS.norte?` (norte a ${Math.round(PLANTAS.norte)}° da vertical)`:""}. ${s.conf==="média"?"A ligação entre a sala da planta e este ambiente é provável e ainda precisa ser conferida. ":""}Clique em outra sala para abrir o ambiente dela.</p>`);
 }
 /* Códigos das salas: letra de cerca de 11 px na tela; o código só aparece se couber inteiro dentro da sala */
 function ajustaPlanta(){
@@ -1223,13 +1223,13 @@ function ajustaPlanta(){
     const ro=svg.querySelector("g.rosa");
     if(ro){const u=1/k, ox=vb.x+vb.width/2+(r.width/k)/2, oy=vb.y+vb.height/2-(r.height/k)/2, bx=vb.x+vb.width/2-(r.width/k)/2, by=vb.y+vb.height/2+(r.height/k)/2;
       const m=[2,5,10,20,25,50,100].filter(v=>v*10*k<=130).pop()||2;
-      ro.innerHTML=`<path d="M${ox-26*u} ${oy+12*u}l${-7*u} ${18*u}h${14*u}z"/><text x="${ox-26*u}" y="${oy+46*u}" font-size="${14*u}" text-anchor="middle">N</text>`+
+      ro.innerHTML=rosaNorte(ox-30*u,oy+40*u,u,PLANTAS&&PLANTAS.norte)+
         `<path d="M${bx+16*u} ${by-16*u}h${m*10}" stroke="var(--petroleo)" stroke-width="${3*u}"/><path d="M${bx+16*u} ${by-21*u}v${10*u}M${bx+16*u+m*10} ${by-21*u}v${10*u}" stroke="var(--petroleo)" stroke-width="${1.5*u}"/>`+
         `<text x="${bx+16*u}" y="${by-26*u}" font-size="${13*u}">${m} m</text>`}
     svg.querySelectorAll("text.cod").forEach(t=>{
       t.setAttribute("font-size",fs.toFixed(1)); t.style.display="";
       const p=svg.querySelector(`.sala[data-sala="${t.dataset.s}"] path`); if(!p){t.style.display="none";return}
-      const b=t.getBBox(), m=fs*0.12, cs=[[b.x+m,b.y+m],[b.x+b.width-m,b.y+m],[b.x+m,b.y+b.height-m],[b.x+b.width-m,b.y+b.height-m]];
+      const b=t.getBBox(), m=0.5, cs=[[b.x+m,b.y+m],[b.x+b.width-m,b.y+m],[b.x+m,b.y+b.height-m],[b.x+b.width-m,b.y+b.height-m],[b.x+b.width/2,b.y+m],[b.x+b.width/2,b.y+b.height-m]];
       if(!cs.every(([x,y])=>p.isPointInFill(new DOMPoint(x,y))))t.style.display="none";
     });
   });
@@ -1239,6 +1239,14 @@ function infoSala(i,sg){
   const s=PLANTAS.salas[i], a=s.amb?IX.amb.get(s.amb):null, st=a&&a.setor?setor(a.setor):null;
   if(!a)return`<span class="rot">Sala da planta</span><b>${esc(s.cod||"Sem código")}</b><p>${esc(s.nome||"Sem nome na planta")}${s.area?" · "+m2(s.area)+" na planta":""}. Sem ambiente correspondente no inventário: a conferir.</p>`;
   return`<span class="rot">${esc(a.tipo||"Ambiente")}${s.cod?" · "+esc(s.cod)+" na planta":""}</span><b>${esc(a.nome)}</b><p>${esc(a.id)}${a.bloco!==sg?" · bloco "+esc(a.bloco):""} · ${m2(a.area)} no inventário${s.area?" ("+m2(s.area)+" na planta)":""}${st?" · "+esc(st.nome||st.sigla||""):""}.${s.conf==="média"?" Ligação provável, a conferir.":""} Clique para abrir o ambiente.</p>`;
+}
+/* Seta do norte (pedido de Marcel, 24/11/2026): o desenho segue a orientação das plantas, com os prédios retos na tela;
+   a seta mostra o norte girado em relação à vertical da tela (tracejada), com os graus escritos. u = unidades do desenho por pixel */
+function rosaNorte(cx,cy,u,ang){
+  const g=+ang||0, a=Math.round(g);
+  return `<path d="M${cx} ${cy-21*u}V${cy+12*u}" stroke="var(--cinza)" stroke-width="${u}" stroke-dasharray="${3*u} ${2.5*u}" fill="none"/>`+
+    `<g transform="rotate(${g.toFixed(2)} ${cx} ${cy})"><path d="M${cx} ${cy-21*u}l${-6*u} ${15*u}h${12*u}z"/><path d="M${cx} ${cy-6*u}V${cy+12*u}" stroke="var(--petroleo)" stroke-width="${1.6*u}"/>`+
+    `<text x="${cx}" y="${cy-25*u}" font-size="${13*u}" text-anchor="middle">N</text></g>`+(a?`<text x="${cx+8*u}" y="${cy+16*u}" font-size="${11*u}">${a}°</text>`:"");
 }
 function infoBloco(sg,M){
   const b=IX.blo?IX.blo.get(sg):D.blocos.find(x=>x.sigla===sg), as=IX.ambBlo.get(sg)||[], s=M.solidos.find(x=>x.b===sg), ap=M.aprox.find(x=>x.b===sg);
@@ -1256,14 +1264,15 @@ function mapaSolidos(){
   const ap=M.aprox.map(a=>`<g class="sol ap" data-ir="blo-${esc(sl(a.b))}" data-sg="${esc(a.b)}" tabindex="0" role="link" aria-label="${tit(a.b)} (posição aproximada)"><title>${tit(a.b)}\n${esc(a.nota)}</title>`+
       `<circle cx="${a.x}" cy="${a.y}" r="${a.r}"/>${a.caixa?`<rect x="${a.caixa[0]}" y="${a.caixa[1]}" width="${a.caixa[2]}" height="${a.caixa[3]}" rx="1.1"/>`:""}<text x="${a.lx}" y="${a.ly}" font-size="${(fs*.86).toFixed(2)}" text-anchor="${a.anc}">${esc(a.t)}</text></g>`).join("");
   const W=M.w, H=M.h, nx=W-10, ny=14;
-  const rosa=`<g class="rosa" font-size="${fs}"><path d="M${nx} ${ny-9}l-3.2 8.5h6.4z" fill="var(--petroleo)"/><text x="${nx}" y="${ny+4.6}" text-anchor="middle">N</text>`+
+  const ang=(M.origem&&M.origem.norte_graus)||0, grau=Math.round(ang);
+  const rosa=`<g class="rosa" font-size="${fs}">${rosaNorte(nx-4,ny+10,0.45,ang)}`+
     `<path d="M8 ${H-8}h50" stroke="var(--petroleo)" stroke-width="1.2"/><path d="M8 ${H-10.5}v5M58 ${H-10.5}v5M33 ${H-9.5}v3" stroke="var(--petroleo)" stroke-width=".8"/><text x="8" y="${H-12}">50 m</text></g>`;
   const ini=`<span class="rot">Mapa do CT</span><b>${plural(M.solidos.length,"bloco desenhado","blocos desenhados")}</b><p>Passe o cursor sobre um bloco para ver o resumo; clique (ou toque) para abrir a página do bloco.${M.aprox.length?` ${plural(M.aprox.length,"bloco ocupa","blocos ocupam")} parte de outro prédio ou um andar e ${M.aprox.length===1?"aparece":"aparecem"} como círculo.`:""}</p>`;
-  return quadro("Mapa do CT",`<p class="mapa-cel">Arraste o mapa para o lado para ver os blocos do leste.</p><div class="mapa-sol"><div class="mapawrap"><svg class="mapa-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa do CT com o norte para cima: cada bloco é um sólido clicável">${sol}${ap}${rosa}</svg></div>`+
+  return quadro("Mapa do CT",`<p class="mapa-cel">Arraste o mapa para o lado para ver os blocos do leste.</p><div class="mapa-sol"><div class="mapawrap"><svg class="mapa-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa do CT na orientação das plantas, com o norte a ${grau} graus da vertical: cada bloco é um sólido clicável">${sol}${ap}${rosa}</svg></div>`+
     `<div class="mapa-lado"><div class="mapa-info" aria-live="polite" data-ini="${esc(ini)}">${ini}</div>`+
     `<ul class="mapa-leg"><li><i></i><span>Bloco: o contorno do prédio tirado das paredes da planta do térreo. Prédios com mais de um bloco aparecem divididos por uma linha branca, pelas salas de cada bloco.</span></li>`+
     (M.aprox.length?`<li><i class="ap"></i><span>Bloco que ocupa parte de outro prédio ou um andar de outro bloco (posição aproximada).</span></li>`:"")+`</ul>`+
-    `<p class="dica">Desenho com o norte para cima, na escala real (${esc(M.fonte)}).${sem.length?` Fora do mapa: ${sem.map(b=>esc(b.sigla)+(M.sem_posicao&&M.sem_posicao[b.sigla]?" ("+esc(M.sem_posicao[b.sigla].charAt(0).toLowerCase()+M.sem_posicao[b.sigla].slice(1))+")":"")).join("; ")}.`:""}</p></div></div>`);
+    `<p class="dica">${grau?`Desenho na orientação das plantas do CT, com os prédios retos na tela; o norte fica a ${grau}° da vertical, no sentido horário (seta N). Escala real`:"Desenho com o norte para cima, na escala real"} (${esc(M.fonte)}).${sem.length?` Fora do mapa: ${sem.map(b=>esc(b.sigla)+(M.sem_posicao&&M.sem_posicao[b.sigla]?" ("+esc(M.sem_posicao[b.sigla].charAt(0).toLowerCase()+M.sem_posicao[b.sigla].slice(1))+")":"")).join("; ")}.`:""}</p></div></div>`);
 }
 function mapaBlocos(){
   if(MAPA&&MAPA.solidos)return mapaSolidos();
@@ -1646,7 +1655,7 @@ const carrega=n=>{const e=document.getElementById("emb-"+n);return e?new Promise
 ROTA=lerRota(location.hash);
 carrega("dados").then(j=>{
   D=j; indexar();
-  $("#rodapeDados").textContent=`Versão 6 do protótipo do portal (24/11/2026), com os dados da planilha-modelo ${D.meta.versao} (inventário de ${D.meta.inventario}). Em caso de divergência, vale a informação do sistema oficial.`;
+  $("#rodapeDados").textContent=`Versão 7 do protótipo do portal (24/11/2026), com os dados da planilha-modelo ${D.meta.versao} (inventário de ${D.meta.inventario}). Em caso de divergência, vale a informação do sistema oficial.`;
   irPara(ROTA.txt,false);
   carrega("plantas").then(p=>{PLANTAS=p;if(/^#(blo|amb)-/.test(location.hash)){const y=window.scrollY;desenhar();window.scrollTo({top:y})}},()=>{});
   carrega("mapa").then(m=>{MAPA=m;D.blocos.forEach(b=>{const c=m.blocos[b.sigla];if(c){b.lat=c.c[0];b.lon=c.c[1]}});const y=window.scrollY;desenhar();window.scrollTo({top:y})},()=>{});
