@@ -1279,7 +1279,7 @@ function mapaBlocos(){
 function vBlocos(){
   const sem=D.blocos.filter(b=>b.lat==null).length, porArea=[...D.blocos].map(b=>[b.sigla,soma(IX.ambBlo.get(b.sigla)||[],a=>a.area)]).sort((a,b)=>b[1]-a[1]).slice(0,3);
   return cab("predio","Blocos",alterna())+
-    fala("Blocos",`O CT tem ${plural(D.blocos.length,"bloco","blocos")} no inventário. Os maiores em área são ${juntar(porArea.map(x=>`${esc(x[0])} (${fmt(x[1],0)} m²)`))}. Abra um bloco para ver a planilha das salas, com filtro por pavimento; ${sem} blocos ainda não têm coordenada e ficam fora do mapa.`)+
+    fala("Blocos",`O CT tem ${plural(D.blocos.length,"bloco","blocos")} no inventário. Os maiores em área são ${juntar(porArea.map(x=>`${esc(x[0])} (${fmt(x[1],0)} m²)`))}. Abra um bloco para ver a planta de cada pavimento e a planilha das salas${sem?`; ${sem===1?"só 1 bloco ainda fica":fmt(sem)+" blocos ainda ficam"} fora do mapa`:""}.`)+
     mapaBlocos()+
     (emPlanilha()?planilha("blocos",todas(K_BLO),D.blocos,{ord:["sigla",1],ir:b=>"blo-"+sl(b.sigla)}):grade(D.blocos.map(cBloco).join("")));
 }
